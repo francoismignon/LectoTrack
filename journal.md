@@ -39,3 +39,20 @@ Snapshots:   0 total
 Time:        X.XXX s
 Ran all test suites.
 ``` 
+## Entrée 2: Mise en place de Git et Push sur GitHub
+
+**Date:** $(date +'%Y-%m-%d %H:%M:%S')
+
+**Actions Effectuées:**
+- Initialisation d'un dépôt Git local (`git init`).
+- Création d'un fichier `.gitignore` pour exclure les fichiers non pertinents (ex: `node_modules`).
+- Ajout de tous les fichiers du projet à la zone de staging (`git add .`).
+- Création du premier commit avec un message descriptif (`git commit -m "Initial commit: Setup Node.js/Express project and basic server (Ticket 1.1)"`).
+- Création manuelle d'un dépôt distant sur GitHub.
+- Liaison du dépôt local au dépôt distant (`git remote add origin git@github.com:francoismignon/lectotrack.git`).
+- Renommage de la branche principale en `master` (ou `main` selon la configuration) (`git branch -M master`).
+- Poussée initiale du code vers le dépôt distant sur GitHub (`git push -u origin master`).
+
+**Objectif:**
+- Versionner le code source du projet.
+- Faciliter la collaboration et la sauvegarde du code sur GitHub.
