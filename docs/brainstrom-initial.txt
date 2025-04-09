@@ -1,0 +1,71 @@
+**Objective:** Generate a comprehensive technical spike research document.
+
+**Purpose:** To thoroughly analyze the technical landscape and requirements for developing a specific web application. This research will guide future agentic coding systems in understanding the necessary technologies, architectural patterns, potential challenges, and best practices for implementing the project according to the specified constraints.
+
+**Project Overview:**
+The project is to develop a simple web application for tracking personal reading progress. Users will be able to add books, track their reading page by page, add comments throughout their reading, leave a final review, and generate an AI-powered summary of their comments.
+
+**Core Functionality:**
+1.  **Book Management:** Users can input book details (title, author). The application fetches the book cover image from the OpenLibrary API based on this information.
+2.  **Reading Progress Tracking:** Users can update the current page number they are reading. This progress should be visually represented, potentially as a percentage.
+3.  **Annotation:** Users can add comments (impressions, emotions, notes, learned concepts) linked to their reading progress at any point.
+4.  **Final Review:** Upon finishing a book, users can write a final review that will be displayed in their personal library view.
+5.  **AI Summarization:** Users can trigger the generation of a summary based on all the comments they added throughout reading a specific book, utilizing a free-tier AI API. (Acknowledge potential limitations of free APIs).
+
+**Mandatory Technology Stack:**
+* **Backend:** Node.js with Express.js framework
+* **Database:** PostgreSQL (Relational)
+* **Frontend:** React.js framework
+* **External APIs:** OpenLibrary (for book covers), a free AI API (for comment summarization - research suitable options).
+
+**Key Technical Requirements & Constraints to Research:**
+
+1.  **Database Implementation (PostgreSQL):**
+    * Design a relational schema with **at least 6 tables**.
+    * Implement **at least one foreign key relationship**.
+    * Implement **at least one composite key**.
+    * Define and implement necessary data integrity constraints programmatically (e.g., NOT NULL, UNIQUE, CHECK).
+    * Research best practices for structuring data related to users, books, reading progress, and comments.
+
+2.  **Backend Implementation (Node.js/Express):**
+    * Design RESTful API endpoints for all application functionalities.
+    * Apply Object-Oriented Programming (OOP) principles in the backend structure.
+    * Implement robust error handling mechanisms.
+    * Manage asynchronous operations effectively (e.g., database queries, API calls).
+    * Integrate with the PostgreSQL database.
+    * Integrate with third-party APIs (OpenLibrary, AI summarization service).
+
+3.  **Frontend Implementation (React):**
+    * Structure the application using components.
+    * Manage application state effectively.
+    * Implement dynamic content rendering (e.g., updating reading progress visually).
+    * Handle user input through forms.
+    * Communicate with the backend API asynchronously (fetching/sending data).
+    * Implement user interface elements for displaying books, progress, comments, and reviews.
+
+4.  **Security:**
+    * Implement user authentication and authorization mechanisms (research common strategies like session-based auth, JWT, etc., suitable for this stack).
+    * Research and outline methods to protect against common web vulnerabilities, specifically:
+        * SQL Injection
+        * Cross-Site Scripting (XSS)
+        * Session Hijacking
+
+5.  **Specific Features Implementation:**
+    * **Pagination:** Research strategies for implementing pagination on lists of books or comments retrieved from the backend.
+    * **Filtering/Searching:** Research approaches for allowing users to filter or search their library (e.g., by title, author, status).
+    * **Third-Party API Integration:** Detail strategies for interacting with OpenLibrary (finding appropriate endpoints, handling responses/errors) and a suitable free AI API for summarization (identifying potential APIs, understanding their usage limits and requirements).
+
+6.  **Analysis Methods (Informative Context - do not generate these, but research *how* they apply):**
+    * Research how Use Case diagrams, Class diagrams, Conceptual/Logical/Physical Data Models, and Wireframes would typically inform the technical design of this specific application using the defined stack.
+    * Research standard approaches for defining a Test Plan relevant to the required functionalities and technologies.
+
+**Scope and Focus:**
+* The primary output should be a **technical spike research document**.
+* Focus exclusively on researching *how* to implement the features and meet the technical requirements using the specified stack (Node.js, Express, PostgreSQL, React) and external services.
+* Identify potential libraries, modules, design patterns, architectural choices, and implementation strategies.
+* Highlight potential technical challenges and trade-offs associated with different approaches within the given constraints.
+* **Do not** include project management plans (task breakdown, time estimates) or generate actual application code.
+* The research should assume all specified requirements and constraints are mandatory.
+
+**Output Format:**
+A structured technical document detailing the research findings for each key requirement area (Database, Backend, Frontend, Security, Features, API Integration, Analysis Methods Applicability). Include analysis of options, recommended approaches, relevant tools/libraries, and considerations for implementation within the context of the project's scope and constraints.

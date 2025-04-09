@@ -1,0 +1,323 @@
+Epics and Tickets
+Here is a breakdown of the project into epics, each with a specific goal and associated tickets detailing acceptance criteria, background, and technology suggestions.
+
+Epic 1: Core Backend Setup & Database Foundation
+Goal: Establish the foundational backend server, integrate the chosen ORM, and set up the initial PostgreSQL database schema based on the technical spike research.
+
+Ticket 1.1: Setup Node.js/Express Project & Basic Server
+Background: Initialize the Node.js project structure, install Express, and create a basic runnable HTTP server. This forms the absolute base for the backend.    
+Acceptance Criteria:
+Node.js project initialized (package.json).
+Express.js installed as a dependency.
+A basic Express server can be started (npm start or similar).
+Server responds to a simple health check route (e.g., GET /health).
+Technology Suggestions: Node.js, Express.js, npm/yarn.
+Ticket 1.2: Integrate ORM (Prisma/TypeORM) & Database Connection
+Background: Integrate the selected ORM (Prisma is slightly favored in the research ) to manage database interactions and establish a connection to the PostgreSQL database.    
+Acceptance Criteria:
+Chosen ORM (Prisma or TypeORM) installed and configured.
+Application successfully connects to the PostgreSQL database on startup.
+Basic ORM configuration files are present (e.g., prisma/schema.prisma or TypeORM ormconfig.json/entities).
+Connection pooling is configured appropriately.
+Technology Suggestions: Node.js, Express.js, Prisma or TypeORM, PostgreSQL, node-postgres (pg driver).    
+Ticket 1.3: Define Initial Database Schema & Run First Migration
+Background: Define the core database tables (users, books, user_books) using the ORM's schema definition language/decorators based on the proposed schema. Run the initial migration to create these tables in the database.    
+Acceptance Criteria:
+users table schema defined (including user_id, email, password_hash, etc.).    
+books table schema defined (including book_id, title, author, cover_image_url, etc.).    
+user_books junction table schema defined (including composite PK user_id, book_id, status, current_page, etc.).    
+Appropriate data types, constraints (NOT NULL, UNIQUE), and foreign key relationships are defined.    
+An initial database migration is successfully generated and applied.
+Technology Suggestions: Prisma Migrate or TypeORM Migrations, PostgreSQL.    
+Ticket 1.4: Implement Basic Layered Architecture (Controllers, Services, Repositories)
+Background: Set up the basic folder structure and classes for the layered architecture (Controllers, Services, Repositories) to promote separation of concerns and testability from the start. Implement a simple example flow (e.g., for the health check).    
+Acceptance Criteria:
+Directory structure for controllers, services, repositories (or similar) exists.
+Base classes or interfaces for services/repositories are defined (optional but good practice).
+A basic controller, service, and potentially repository exist for a simple route (like /health).
+Dependency Injection setup (optional for now, can be deferred) is considered.    
+Technology Suggestions: Node.js, Express.js, TypeScript (recommended for OOP/TypeORM/Prisma).
+Epic 2: User Authentication & Management
+Goal: Implement secure user registration, login, logout functionality, and basic profile management, establishing the core identity system for the application.
+
+Ticket 2.1: Implement User Registration Endpoint
+Background: Create the API endpoint for new users to register, ensuring passwords are securely hashed before storage.    
+Acceptance Criteria:
+POST /auth/register endpoint exists.
+Accepts user credentials (e.g., username, email, password).
+Validates input (e.g., email format, password complexity).    
+Hashes the user's password securely (e.g., using bcrypt).    
+Creates a new user record in the users table.    
+Handles duplicate email/username errors gracefully.
+Returns an appropriate success response (e.g., 201 Created) or error response.    
+Technology Suggestions: Node.js, Express.js, Prisma/TypeORM, bcrypt, express-validator.    
+Ticket 2.2: Implement User Login Endpoint & Authentication Strategy
+Background: Create the API endpoint for users to log in. Implement the chosen authentication strategy (JWT with Refresh Tokens in HttpOnly Cookies recommended).    
+Acceptance Criteria:
+POST /auth/login endpoint exists.    
+Accepts user credentials (email/username, password).
+Finds the user in the database.
+Compares the provided password with the stored hash using bcrypt.
+If credentials are valid, generates tokens (access/refresh) or starts a session.    
+Sets the refresh token or session ID in a secure HttpOnly cookie.    
+Returns the access token (if using JWT) and user information in the response body.    
+Returns appropriate error responses for invalid credentials or other issues.    
+Technology Suggestions: Node.js, Express.js, Prisma/TypeORM, bcrypt, jsonwebtoken (if JWT), express-session & connect-pg-simple (if sessions), cookie-parser.    
+Ticket 2.3: Implement Authentication Middleware
+Background: Create Express middleware to protect routes that require authentication. The middleware should verify the incoming access token (JWT) or session.    
+Acceptance Criteria:
+Middleware function exists that can be applied to protected routes.
+If JWT: Extracts access token from the Authorization header. Verifies the token's signature and expiry using jsonwebtoken.    
+If Sessions: Verifies the existence of a valid session using express-session.    
+If valid, attaches user information (e.g., userId) to the req object (req.user).    
+If invalid (missing token/session, expired, invalid signature), sends a 401 Unauthorized or 403 Forbidden response.    
+Technology Suggestions: Node.js, Express.js, jsonwebtoken (if JWT), express-session (if sessions).    
+Ticket 2.4: Implement Logout Endpoint & Token/Session Invalidation
+Background: Create an endpoint for users to log out, invalidating their session or clearing relevant tokens/cookies.    
+Acceptance Criteria:
+POST /auth/logout endpoint exists.
+If JWT: Clears the HttpOnly cookie containing the refresh token. (Server-side invalidation might require a blacklist if immediate revocation is needed, but clearing the cookie is often sufficient).    
+If Sessions: Destroys the server-side session using req.session.destroy(). Clears the session cookie.    
+Returns a success response (e.g., 204 No Content).    
+Technology Suggestions: Node.js, Express.js, cookie-parser, express-session (if sessions).    
+Ticket 2.5: Implement Basic User Profile Endpoint
+Background: Create a simple endpoint to retrieve basic information for the currently authenticated user.    
+Acceptance Criteria:
+GET /users/me endpoint exists and is protected by authentication middleware.    
+Retrieves userId from req.user (attached by middleware).
+Fetches user details (excluding sensitive info like password hash) from the database.
+Returns user information (e.g., ID, username, email) in the response.
+Technology Suggestions: Node.js, Express.js, Prisma/TypeORM.    
+Epic 3: Book Management & Progress Tracking
+Goal: Allow authenticated users to add books to their library (fetching covers from OpenLibrary), view their books, track reading progress (page number), and remove books.
+
+Ticket 3.1: Implement "Add Book" Endpoint & OpenLibrary Integration
+Background: Create an endpoint for users to add a book by title/author. The backend should interact with the OpenLibrary API to find the book and fetch its cover image URL.    
+Acceptance Criteria:
+POST /books endpoint exists and is protected.    
+Accepts title and author in the request body.
+Calls the OpenLibrary Search API to find a matching book identifier (OLID/ISBN).    
+Calls the OpenLibrary Covers API to get the cover image URL using the identifier.    
+Handles errors from OpenLibrary (book not found, cover not found).    
+Creates a record in the books table (if not already existing based on identifier).    
+Creates a record in the user_books table linking the user and the book, setting default status ('to-read').    
+Returns the newly added book details (including cover URL) in the response.
+Technology Suggestions: Node.js, Express.js, Prisma/TypeORM, Axios (or node-fetch), OpenLibrary API knowledge.    
+Ticket 3.2: Implement "Get User's Books" Endpoint (List View)
+Background: Create an endpoint to retrieve the list of books associated with the authenticated user, including basic details and progress. This will populate the main library view.    
+Acceptance Criteria:
+GET /books endpoint exists and is protected.    
+Retrieves userId from req.user.
+Fetches books linked to the user via the user_books table, joining with the books table.
+Includes essential book details (title, author, cover URL) and user-specific progress (status, current_page, total_pages).    
+Returns a list of books.
+(Pagination & Filtering will be added in later tickets within this Epic).
+Technology Suggestions: Node.js, Express.js, Prisma/TypeORM.    
+Ticket 3.3: Implement "Get Book Details" Endpoint
+Background: Create an endpoint to retrieve detailed information for a specific book in the user's library.    
+Acceptance Criteria:
+GET /books/{bookId} endpoint exists and is protected.    
+Retrieves userId from req.user and bookId from req.params.
+Fetches detailed information for the specific bookId linked to the userId from books and user_books.
+Ensures the user is authorized to view this book record.
+Returns detailed book information and progress.
+Returns 404 if the book is not found or not linked to the user.    
+Technology Suggestions: Node.js, Express.js, Prisma/TypeORM.    
+Ticket 3.4: Implement "Update Reading Progress" Endpoint
+Background: Allow users to update their current page number for a book they are reading. This might also involve updating the reading status (e.g., to 'reading' or 'finished').    
+Acceptance Criteria:
+PUT /books/{bookId}/progress endpoint exists and is protected.    
+Retrieves userId from req.user and bookId from req.params.
+Accepts currentPage (and optionally totalPages, status) in the request body.
+Validates input (e.g., currentPage is non-negative).
+Updates the corresponding record in the user_books table for the user/book combination.    
+Returns the updated progress information or a success status.
+Returns 404 if the book is not found or not linked to the user.    
+Technology Suggestions: Node.js, Express.js, Prisma/TypeORM, express-validator.    
+Ticket 3.5: Implement "Delete Book" Endpoint
+Background: Allow users to remove a book from their personal library. This should remove the association, not necessarily the book itself if other users track it (soft delete or check references).    
+Acceptance Criteria:
+DELETE /books/{bookId} endpoint exists and is protected.    
+Retrieves userId from req.user and bookId from req.params.
+Deletes the corresponding record from the user_books table for the user/book combination.    
+(Consider if related data like annotations/reviews for this user/book should also be deleted - cascade or handle manually).
+Returns a success response (e.g., 204 No Content).    
+Returns 404 if the book is not found or not linked to the user.    
+Technology Suggestions: Node.js, Express.js, Prisma/TypeORM.    
+Ticket 3.6: Add Pagination to "Get User's Books" Endpoint
+Background: Implement cursor-based pagination on the GET /books endpoint to handle potentially large libraries efficiently.    
+Acceptance Criteria:
+GET /books accepts optional limit and cursor query parameters.    
+Uses cursor-based logic in the database query (e.g., WHERE id > cursor ORDER BY id LIMIT limit).    
+The response includes a list of book items and a nextCursor value (e.g., the ID of the last item in the list).    
+If it's the last page, nextCursor is null or omitted.
+Technology Suggestions: Node.js, Express.js, Prisma/TypeORM (specific cursor pagination features).    
+Ticket 3.7: Add Filtering/Searching to "Get User's Books" Endpoint
+Background: Enhance the GET /books endpoint to allow filtering by reading status (reading, finished, to-read) and searching by title/author.    
+Acceptance Criteria:
+GET /books accepts optional status and search query parameters.    
+Dynamically adds conditions to the database query based on provided parameters (e.g., WHERE status = ?, WHERE title ILIKE ? OR author ILIKE ?).    
+Search is case-insensitive.
+Works correctly in combination with pagination.
+Relevant database columns (status, title, author) are indexed for performance.    
+Technology Suggestions: Node.js, Express.js, Prisma/TypeORM, PostgreSQL indexing.    
+Epic 4: Annotations & Reviews
+Goal: Enable users to add time-stamped, page-associated annotations during reading and write a final review upon finishing a book.
+
+Ticket 4.1: Define Annotation & Review DB Schema & Migrations
+Background: Define the database tables (annotations, reviews) using the ORM, including relationships to users and books, and run migrations.    
+Acceptance Criteria:
+annotations table schema defined (including annotation_id, FKs user_id, book_id, page_number, annotation_text, created_at).    
+reviews table schema defined (including review_id, FKs user_id, book_id, rating, review_text, created_at, UNIQUE constraint on user/book).    
+Appropriate constraints (FKs, NULL checks, CHECK for rating, UNIQUE) are defined.    
+Database migrations are generated and applied successfully.
+Technology Suggestions: Prisma Migrate or TypeORM Migrations, PostgreSQL.    
+Ticket 4.2: Implement "Add Annotation" Endpoint
+Background: Create an endpoint for users to add annotations (comments) related to a specific book they are tracking, optionally linking it to a page number.    
+Acceptance Criteria:
+POST /books/{bookId}/annotations endpoint exists and is protected.    
+Retrieves userId from req.user and bookId from req.params.
+Accepts annotationText and optional pageNumber in the request body.
+Validates input.
+Verifies the user is tracking the specified bookId.
+Creates a new record in the annotations table with the correct user_id, book_id, text, page number, and timestamp.    
+Returns the newly created annotation or a success status.
+Technology Suggestions: Node.js, Express.js, Prisma/TypeORM, express-validator.    
+Ticket 4.3: Implement "Get Annotations" Endpoint (with Pagination)
+Background: Create an endpoint to retrieve annotations for a specific book tracked by the user, implementing cursor-based pagination.    
+Acceptance Criteria:
+GET /books/{bookId}/annotations endpoint exists and is protected.    
+Retrieves userId from req.user and bookId from req.params.
+Accepts optional limit and cursor query parameters.    
+Verifies the user is tracking the specified bookId.
+Fetches annotations for the given user/book, ordered by creation time or ID.    
+Implements cursor-based pagination correctly.    
+Returns a list of annotations and a nextCursor.    
+Technology Suggestions: Node.js, Express.js, Prisma/TypeORM.    
+Ticket 4.4: Implement "Add/Update Review" Endpoint
+Background: Allow users to add or update their final review (text and rating) for a book they have marked as 'finished'.    
+Acceptance Criteria:
+POST /books/{bookId}/review endpoint exists and is protected.    
+Retrieves userId from req.user and bookId from req.params.
+Accepts reviewText and rating (optional) in the request body.
+Validates input (e.g., rating between 1-5).    
+Verifies the user is tracking the specified bookId (and potentially that status is 'finished').
+Creates or updates the record in the reviews table (using the UNIQUE constraint on user/book).    
+Returns the created/updated review or a success status.
+Technology Suggestions: Node.js, Express.js, Prisma/TypeORM, express-validator.    
+Ticket 4.5: Implement "Get Review" Endpoint
+Background: Create an endpoint to retrieve the user's review for a specific book.    
+Acceptance Criteria:
+GET /books/{bookId}/review endpoint exists and is protected.    
+Retrieves userId from req.user and bookId from req.params.
+Verifies the user is tracking the specified bookId.
+Fetches the review (if any) from the reviews table for the user/book combination.    
+Returns the review details or 404 if no review exists.    
+Technology Suggestions: Node.js, Express.js, Prisma/TypeORM.    
+Epic 5: AI Summarization Integration
+Goal: Integrate a free-tier AI service to generate summaries based on a user's annotations for a specific book.
+
+Ticket 5.1: Define AI Summaries DB Schema & Migration
+Background: Define the optional ai_summaries table to store generated summaries, preventing repeated API calls.    
+Acceptance Criteria:
+ai_summaries table schema defined (including summary_id, FKs user_id, book_id, summary_text, generated_at, UNIQUE constraint on user/book).    
+Database migration generated and applied.
+Technology Suggestions: Prisma Migrate or TypeORM Migrations, PostgreSQL.    
+Ticket 5.2: Research & Select Free-Tier AI API
+Background: Finalize the choice of a free-tier AI summarization API based on the research (Hugging Face, Cohere recommended), verifying current limitations and obtaining necessary API keys/credentials.    
+Acceptance Criteria:
+Specific AI service and model chosen (e.g., Hugging Face Inference API with bart-large-cnn).    
+API key obtained and securely stored (e.g., environment variables).
+Understanding of API request format, response format, rate limits, and input length limits.    
+Technology Suggestions: Hugging Face Hub, Cohere Platform, environment variable management (e.g., dotenv).    
+Ticket 5.3: Implement AI Service Integration Logic
+Background: Create a dedicated service (e.g., AIService) in the backend to handle communication with the chosen AI API.    
+Acceptance Criteria:
+AIService class or module exists.
+Contains a method that takes text input (concatenated annotations).
+Uses Axios or fetch to make requests to the AI API endpoint, including the API key securely.
+Parses the summary from the AI API response.
+Includes robust error handling for API failures, rate limits, and timeouts.    
+Technology Suggestions: Node.js, Axios/fetch, TypeScript/JavaScript.    
+Ticket 5.4: Implement "Generate Summary" Endpoint
+Background: Create the backend endpoint that triggers the summarization process for a user's annotations on a specific book.    
+Acceptance Criteria:
+POST /books/{bookId}/summary endpoint exists and is protected.    
+Retrieves userId from req.user and bookId from req.params.
+Fetches all annotations for the user/book from the annotations table.    
+Concatenates annotation text, respecting potential AI input limits.    
+Calls the AIService to get the summary.    
+Stores the generated summary in the ai_summaries table.    
+Returns the generated summary in the response.    
+(Optional: Modify to trigger an async job instead of direct call).    
+Technology Suggestions: Node.js, Express.js, Prisma/TypeORM, previously created AIService.    
+Ticket 5.5: Implement "Get Summary" Endpoint
+Background: Create an endpoint to retrieve a previously generated AI summary for a user and book.    
+Acceptance Criteria:
+GET /books/{bookId}/summary endpoint exists and is protected.    
+Retrieves userId from req.user and bookId from req.params.
+Fetches the summary (if any) from the ai_summaries table for the user/book combination.    
+Returns the summary text or 404 if no summary exists.    
+Technology Suggestions: Node.js, Express.js, Prisma/TypeORM.    
+Epic 6: Frontend Foundation & UI Implementation
+Goal: Set up the React frontend project, configure state management and data fetching libraries, and implement core UI components for displaying books and basic navigation.
+
+Ticket 6.1: Initialize React Project & Basic Structure
+Background: Set up the React frontend application using a standard toolchain (e.g., Create React App or Vite) and establish a basic component/folder structure.    
+Acceptance Criteria:
+React project initialized.
+Basic folder structure for components, services/hooks, pages/views exists.
+Application runs successfully in development mode (npm start or similar).
+Basic routing setup (if needed early, e.g., React Router) is in place.
+Technology Suggestions: React, Vite or Create React App, npm/yarn, React Router (optional).    
+Ticket 6.2: Setup State Management (React Query & Zustand)
+Background: Install and configure the chosen state management libraries: React Query for server state and Zustand for global client state, based on research recommendations.    
+Acceptance Criteria:
+@tanstack/react-query installed.
+QueryClientProvider set up at the application root.
+zustand installed.
+Basic Zustand store created (e.g., for auth state, though might be handled by React Query/cookies).
+React Query DevTools integrated for debugging.    
+Technology Suggestions: React, React Query, Zustand.    
+Ticket 6.3: Implement API Client Service (Axios)
+Background: Create a centralized service or hook for making API calls to the backend using Axios, including base URL configuration and potentially interceptors for auth tokens.    
+Acceptance Criteria:
+axios installed.
+A utility/service function or Axios instance created for making API requests.
+Base URL configured (likely using environment variables).
+(Optional) Request interceptor set up to add the JWT access token to Authorization headers if needed.
+(Optional) Response interceptor set up for basic error handling or token refresh logic.
+Technology Suggestions: React, Axios, JavaScript/TypeScript.    
+Ticket 6.4: Implement BookList & BookItem Components
+Background: Create the React components responsible for displaying the list of user's books and representing a single book item within that list, including title, author, and cover image.    
+Acceptance Criteria:
+BookList component exists.
+Uses useInfiniteQuery (React Query) to fetch data from the GET /books backend endpoint.    
+Renders a list of BookItem components based on fetched data.
+Handles loading and error states from React Query.    
+BookItem component exists.
+Accepts book data (title, author, cover URL, progress) as props.    
+Displays the book information correctly, including the cover image.
+Technology Suggestions: React, React Query, Axios (via API client), CSS/UI Library (e.g., Chakra UI, MUI).    
+Ticket 6.5: Implement ProgressBar Component
+Background: Create a reusable visual component to display the reading progress percentage based on current and total pages.    
+Acceptance Criteria:
+ProgressBar component exists.
+Accepts currentPage and totalPages as props.
+Calculates the progress percentage accurately.    
+Visually represents the percentage (e.g., a filled bar).
+Handles cases where totalPages might be null or zero gracefully.
+Technology Suggestions: React, CSS/Styled Components/UI Library.    
+Ticket 6.6: Implement Basic Authentication Forms (Login/Register)
+Background: Create the UI forms for user registration and login, integrating with React Hook Form for handling input and validation.    
+Acceptance Criteria:
+LoginForm and RegistrationForm components exist.
+Use react-hook-form for managing form state and inputs.    
+Include fields for email/username and password.
+Implement basic client-side validation (e.g., required fields, email format).    
+On submit, call the corresponding backend API endpoints (POST /auth/login, POST /auth/register) using the API client.
+Handle API success (e.g., store auth state/token, redirect) and error responses (display messages).
+Technology Suggestions: React, React Hook Form, Yup or Zod (for validation), Axios (via API client), React Router (for redirects).    
+Self-Correction: Added more detail to frontend tickets and split out pagination/filtering for the backend book list.
+
+This structure provides a phased approach, starting with core backend and database setup, moving through authentication, core features (books, annotations, reviews), AI integration, frontend setup, and finally security hardening. Each ticket is designed to be relatively small, promoting incremental development.

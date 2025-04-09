@@ -1,0 +1,353 @@
+Product Requirements Document
+Personal Reading Tracker Web Application
+
+Date Created: [Insert Date]
+Due Date for Technical Dossier: 4 June 2025
+Oral Defense: 11 June 2025
+
+1. Introduction
+1.1. Purpose and Vision
+The Personal Reading Tracker web application is intended to help users manage and track their reading habits. Users will be able to enter book details, monitor their reading progress, add in‐line annotations (reflecting impressions, emotions, moods, and lessons learned), write a final review once a book is finished, and trigger an AI-based summarization of their collected annotations. The application is built with simplicity in mind while meeting strict course requirements.
+
+1.2. Target Audience
+Students and casual readers who wish to track reading progress and engage with content interactively.
+
+Academic project teams that require a demonstrable, secure, and technically sound product with clear documentation.
+
+2. Scope and Constraints
+2.1. In-Scope
+Core Features:
+
+Book Management: Adding books using basic details (title, author) with automatic cover fetching via the OpenLibrary API.
+
+Progress Tracking: Allow users to record their current page, which is converted to a percentage and visually represented.
+
+Annotations: Enable users to add dynamic comments (annotations) during reading.
+
+Final Review: Allow users to submit a concluding review for each book, which appears in their personal library.
+
+AI Summarization: Integrate a free-tier AI API for summarizing cumulative annotations.
+
+Technical Requirements:
+
+A robust PostgreSQL database with at least six tables and enforced integrity constraints.
+
+A RESTful backend using Node.js and Express.js.
+
+A responsive frontend built with React.
+
+Secure authentication, role-based access, and protection against common vulnerabilities (SQL injection, XSS, session hijacking).
+
+Proper error handling and asynchronous processing patterns.
+
+Academic Deliverables:
+
+A full technical dossier (including use-case diagrams, class diagrams, DB models, wireframes, and test plans).
+
+An oral presentation to defend technical choices.
+
+2.2. Out-of-Scope
+Any features beyond the mandatory functionalities noted by the course (i.e., “pas plus et surtout pas moins”).
+
+Complex UI/UX designs or advanced analytics that are not required by the professor.
+
+Extensive project management or task estimation outside the provided structure (use basic Kanban/Trello for task tracking).
+
+3. Product Features and Functional Requirements
+3.1. User Management & Authentication
+Registration & Login:
+
+API endpoints to register a new user and to authenticate returning users.
+
+Secure storage of passwords (hashed).
+
+Use either JWT with refresh tokens (stored as secure HttpOnly cookies) or session-based authentication as per course constraints.
+
+Profile Management:
+
+A “My Profile” view that shows user data and reading statistics.
+
+3.2. Book Library and Progress Tracking
+Add Book:
+
+Form for users to enter book title and author.
+
+On submission, the backend queries the OpenLibrary API to fetch cover images based on the provided title/author.
+
+Book Details View:
+
+Display fetched cover image, title, author, and additional metadata.
+
+Show a visual progress bar that updates as the user indicates their current page.
+
+Update Progress:
+
+Allow users to update current page or reading status (e.g., ‘to-read’, ‘reading’, ‘finished’).
+
+Convert the current page into a percentage (using total pages if provided) for display.
+
+3.3. Annotations and Reviews
+Annotations:
+
+Allow users to add comments at any point during reading.
+
+Each annotation includes optional page association and timestamp.
+
+List annotations with pagination (cursor-based approach recommended for scalability).
+
+Final Review:
+
+On finishing a book, enable the user to submit a final review and optionally a rating.
+
+Reviews are integrated into the user’s library view.
+
+3.4. AI-Powered Summarization
+AI Summary Generation:
+
+Endpoint to concatenate collected annotations for a book.
+
+Trigger a call (synchronously or via an asynchronous job/queue) to a free-tier AI API (e.g., Hugging Face Inference or Cohere) to generate a summary.
+
+Cache/store the generated summary (one summary per user/book) to avoid repeated API calls.
+
+3.5. Search, Filtering, and Pagination
+Search & Filters:
+
+Implement search capability by book title and author.
+
+Allow filtering by reading status (‘reading’, ‘finished’, ‘to-read’).
+
+Pagination:
+
+Use cursor-based pagination for both book lists and annotation lists to ensure performance consistency.
+
+4. Technical Architecture
+4.1. Technology Stack
+Backend:
+
+Runtime: Node.js
+
+Framework: Express.js
+
+Authentication: JWT with refresh tokens (or express-session with connect-pg-simple for sessions)
+
+ORM/Database Library: Prisma or TypeORM recommended for integrating with PostgreSQL
+
+Database:
+
+System: PostgreSQL
+
+Schema: At least seven tables covering Users, Books, User_Books (junction table), Annotations, Reviews, Reading_Sessions (optional), and AI Summaries.
+
+Frontend:
+
+Library: React
+
+State Management: Mix of React Query (for server state) and Zustand (for client side UI state)
+
+Form Handling: React Hook Form with Yup or Zod for validations
+
+External Services:
+
+OpenLibrary API: Fetch cover images
+
+AI Summarization API: Free-tier integration for commentary summarization
+
+4.2. Layered Architecture
+Web Layer (Controllers):
+
+Handle incoming HTTP requests, trigger input validation (using middleware), and format responses.
+
+Service Layer:
+
+Encapsulate business logic such as handling reading progress updates, annotation management, and integration of external API calls.
+
+Data Access Layer (Repositories):
+
+Abstract database operations using an ORM. Ensure use of parameterized queries to prevent SQL injection.
+
+Dependency Injection:
+
+Use a DI container (e.g., Awilix or InversifyJS) to manage service and repository dependencies for improved testability and modularity.
+
+4.3. Database Design and Integrity
+Schema Overview:
+
+users: Stores user credentials and metadata.
+
+books: Stores book information including title, author, and cover_image_url.
+
+user_books: Junction table capturing the relationship between users and books including reading status and progress. Contains a composite primary key (user_id, book_id).
+
+annotations: Stores user comments for specific pages.
+
+reviews: Stores final reviews and ratings for completed books.
+
+reading_sessions (optional): Tracks reading sessions for more granular progress data.
+
+ai_summaries (optional): Captures AI-generated summary text for each book.
+
+Data Integrity:
+
+Enforce primary key, foreign key, unique, and check constraints to guarantee consistency.
+
+Use indexing on foreign keys and common search/filter fields (e.g., book title, author, user status).
+
+4.4. API Design
+RESTful Endpoints:
+
+Authentication:
+
+POST /auth/register, POST /auth/login, POST /auth/logout
+
+User:
+
+GET /users/me
+
+Books & Progress:
+
+POST /books (add book)
+
+GET /books (retrieve library with filtering, search, and pagination)
+
+GET /books/{bookId} (retrieve book details)
+
+PUT /books/{bookId}/progress (update reading progress)
+
+DELETE /books/{bookId} (delete book from library)
+
+Annotations:
+
+POST /books/{bookId}/annotations
+
+GET /books/{bookId}/annotations
+
+Reviews:
+
+POST /books/{bookId}/review
+
+GET /books/{bookId}/review
+
+AI Summaries:
+
+POST /books/{bookId}/summary
+
+GET /books/{bookId}/summary
+
+Asynchronous Operations:
+
+Handle long-running tasks (like AI summarization) using background job queues and asynchronous patterns (async/await, Promise.all).
+
+4.5. Security and Error Handling
+Authentication & Authorization:
+
+Use secure cookie settings (HttpOnly, Secure, SameSite) whether implementing JWT or session-based authentication.
+
+Validate user claims in middleware to ensure resource access only to the owning user.
+
+Input Validation & SQLi Prevention:
+
+Leverage libraries (e.g., express-validator) for backend request validation.
+
+Utilize ORM mechanisms to employ parameterized queries and prepared statements.
+
+XSS Protection:
+
+Use Helmet middleware to add security-related headers and enforce a strict Content Security Policy.
+
+Error Handling Strategy:
+
+Implement centralized error-handling middleware that logs errors (using libraries like Winston or Pino) and distinguishes operational errors from unexpected issues.
+
+5. User Interface and Frontend Specifications
+5.1. Component Architecture
+Core Components:
+
+AuthForm: For login and registration.
+
+BookList & BookItem: To display the user’s library, including cover images, titles, progress bars, and action buttons.
+
+BookDetail: Detailed view for a selected book, including reading progress, annotations, and final review.
+
+AnnotationForm & AnnotationList: For adding and displaying in-line comments.
+
+ReviewForm: For submitting a final book review.
+
+SearchBar: For filtering and searching the book list.
+
+Dynamic Rendering:
+
+Use React’s conditional rendering, lists (via .map()), and hooks (such as useState and useEffect) to update the UI based on fetched data.
+
+Implement infinite scrolling (using Intersection Observer with React Query’s useInfiniteQuery) for long lists.
+
+5.2. State Management and Data Fetching
+Server State:
+
+Utilize React Query to manage data fetched from the backend API (with built-in support for caching, pagination, and automatic refetching).
+
+Local/Global State:
+
+Manage global UI state (e.g., authentication status, theme preferences) with Zustand or React Context.
+
+Form Handling:
+
+Use React Hook Form for capturing user inputs (e.g., book details, annotation text) with schema validation via Yup or Zod.
+
+6. Quality Assurance and Documentation
+6.1. Testing Strategy
+Unit Testing:
+
+Backend services and utility functions using Jest.
+
+Frontend React components with Jest and React Testing Library.
+
+Integration Testing:
+
+Validate API endpoint interactions via Supertest along with backend integration tests.
+
+End-to-End (E2E) Testing:
+
+Use Cypress to simulate key user flows (registration, adding a book, updating progress, adding annotations, generating summary).
+
+6.2. Documentation and Reporting
+Technical Dossier:
+
+Include use-case diagrams, class diagrams, data model diagrams (conceptual, logical, physical), and wireframes.
+
+Provide a detailed test plan, code capture screenshots, and sample API requests/responses.
+
+Oral Defense Preparation:
+
+Prepare to explain architectural decisions, security measures, choice of libraries, and API design.
+
+7. Implementation Roadmap and Adaptability
+7.1. Iterative Development Phases
+Phase 1: Core Feature Implementation
+
+User authentication, book addition with OpenLibrary integration, and basic progress tracking.
+
+Phase 2: Enhanced User Interactions
+
+Annotation and review functionality including pagination and filtering.
+
+Phase 3: AI Integration and Advanced Error Handling
+
+Integration with the free-tier AI API for summarization and asynchronous job management.
+
+7.2. Room for Adaptation
+The architecture is designed to be modular, allowing the development team to pivot (e.g., swap the ORM, update API endpoints, adjust UI components) if project requirements change or if enhancements are required.
+
+Testing, logging, and security configurations are built to be extensible as further functional or performance needs emerge.
+
+7.3. Milestones and Deadlines
+Dossier d’Analyse: Complete detailed analysis and preliminary code structure by 4 June 2025.
+
+Final Defense: Be prepared to present and defend architectural decisions during the oral presentation on 11 June 2025.
+
+Ongoing: Regularly update technical documentation and unit/integration tests as development progresses.
+
+8. Conclusion
+This PRD establishes a clear and detailed blueprint for building the Personal Reading Tracker web application. By adhering to both the business vision and stringent technical research, the document serves as a robust guide to ensure that the resulting application is secure, maintainable, and aligned precisely with course requirements. The outlined modular architecture, clear API designs, comprehensive security measures, and phased development plan together provide a scalable foundation that both meets the project’s current goals and remains adaptable for future enhancements.
+
+This document is intended to serve as the definitive guide for the development and technical defense of the Personal Reading Tracker project and should be revisited and updated as necessary throughout the project lifecycle.
