@@ -1,14 +1,12 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
+import React, { useState } from 'react'
+import axios from "axios";
+import Register from './components/register.jsx';
+import BookList from './components/bookList.jsx';
 
 function App() {
   return(
     <div>
-      <form className=''>
-        <input type="text" name='firstname'/>
-        <input type="text" name='lastname'/>
-        <input type="button" value="OK" />
-      </form>
+      <BookList />
     </div>
   );
 }
