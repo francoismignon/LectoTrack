@@ -1,7 +1,13 @@
-import express from "express";
-import env from "dotenv";
-// import bcrypt from "bcrypt";
-import cors from 'cors';
+const express = require('express');
+const env = require('dotenv');
+const cors = require('cors');
+const bookRoutes = require('./routes/bookRoutes.js');
+// const userRoutes = require('./routes/userRoutes.js');
+// const authRoutes = require('./routes/authRoutes.js');
+// const authorRoutes = require('./routes/authorRoutes.js');
+// const bookauthorRoutes = require('./routes/bookauthorRoutes.js');
+// const noteRouters = require('./routes/noteRouters.js');
+// const readingRouters = require('./routes/readingRouters.js');
 
 env.config();
 const app = express();
@@ -12,13 +18,21 @@ const PORT = process.env.PORT;
 app.use(express.json());//pour lire le requ.body en JSON
 app.use(cors());
 
-app.get("/api/books", (req, res)=>{
-    res.json({ message: 'Hello depuis Backend !' })
-});
+// Utilisateurs
+// app.use('/api/users', userRoutes);
+// Authentification
+// app.use('/api/auth', authRoutes);
+// Livres
+app.use('/api/books', bookRoutes);
+// Auteurs
+// app.use('/api/authors', authorRoutes)
+// Relations Livre-Auteur
+// app.use('/api/bookauthors', bookauthorRoutes);
+// Notes
+// app.use('/api/notes', noteRouters);
+// Lectures
+// app.use('/api/readings', readingRouters);
 
-app.post("/api/register", (req, res)=>{
-    console.log(req.body);
-});
 
 app.listen(PORT, ()=>{
     console.log(`Le serveur à démarrer sur : http://localhost:${PORT}`);
