@@ -9,7 +9,7 @@ function App() {
       <Routes>
         <Route path="/livres" element={<BookList />} />
         <Route path="/livres/ajouter" element={<AddBookForm />} />
-        {/* <Route path="/livres/:id" element={<BookDetail />} /> */}
+        <Route path="/livres/:id" element={<BookDetail />} />
         {/* <Route path="/livres/:id/modifier" element={<EditBookForm />} /> */}
       </Routes>
     </BrowserRouter>

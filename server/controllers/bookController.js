@@ -13,18 +13,14 @@ const getAllBooks = async (req, res) => {
 };
 
 const createBook = async (req, res) => {
-  const {title, author} = req.body;
+  const {title, firstName, lastName} = req.body;
   const API_URL = "https://openlibrary.org/search.json";
   var bookCoverURL = "";
-
   try {
     const bookURL = await axios.get(`${API_URL}`, {
       params:{
         title:title
       }
-    });
-    bookURL.data.docs.forEach(element => {
-      console.log(element);
     });
     
     const doc = bookURL.data.docs.find(doc => doc.cover_edition_key);
@@ -35,7 +31,7 @@ const createBook = async (req, res) => {
   } catch (error) {
       console.error("Erreur OpenLibrary :", error.message);
   }
-
+//mise a jour du livre dans la DB
   try {
     const newBook= await db.Book.create({
       title: title,
@@ -44,6 +40,16 @@ const createBook = async (req, res) => {
     res.status(201).json(newBook);
   } catch (error) {
     console.error("Erreur Sequelize :", error.message);
+  }
+  //Mise a jour de l'aueur dans la DB
+  try {
+    const newAuthor = await db.Author.create({
+      firstname: firstName,
+      lastname: lastName
+    });
+    res.status(201).json(newAuthor);
+  } catch (error) {
+    console.log(error.message);
   }
 }
 

@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import '../styles/AddBookForm.css';
 import axios from 'axios';
+import { Navigate } from "react-router-dom";
 
 function AddBookForm() {
 
   const [title, setTitle] = useState("");
-  const [author, setAuthor] = useState("");
-  const [bookSearch, setBookSearch] = useState([]);
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
 
   async function handleSearch() {
     try {
@@ -27,10 +28,13 @@ function AddBookForm() {
     try {
       axios.post('http://localhost:3000/api/books', {
         title,
-        author
+        firstName,
+        lastName
       });
-      // setTitle("");
-      // setAuthor("");
+      setTitle("");
+      setFirstName("");
+      setLastName("");
+      Navigate("/BookDetail");
     } catch (error) {
       console.log(error.message);
     }
@@ -38,40 +42,43 @@ function AddBookForm() {
 
   return (
     <div>
-
       <form className="book-form" onSubmit={handleSubmit}>
-        <h2>Ajouter un livre</h2>
-        <label>
-          Titre :
-          <input
-            onChange={(e) => setTitle(e.target.value)}
-            value={title}
-            type="text"
-            placeholder="Ex: Les Misérables"
-            required
-          />
-        </label>
-        <button type="submit" onClick={handleSearch}>Chercher</button>
+  <h2>Ajouter un livre</h2>
+  <label>
+    Titre :
+    <input
+      onChange={(e) => setTitle(e.target.value)}
+      value={title}
+      type="text"
+      placeholder="Ex: Les Misérables"
+      required
+    />
+  </label>
 
-        <label>
-          Auteur :
-          <input
-            onChange={(e) => setAuthor(e.target.value)}
-            value={author}
-            type="text"
-            placeholder="Ex: Victor Hugo"
-            required
-          />
-        </label>
-        <button type="submit">Ajouter</button>
-      </form>
-      <ul>
-        {bookSearch.map((book) => (
-        <li>{book.title} {book.author_name.map(author => {author})}</li>
-        
-        ))}
-        
-      </ul>
+  <label>
+    Prénom de l'auteur :
+    <input
+      onChange={(e) => setFirstName(e.target.value)}
+      value={firstName}
+      type="text"
+      placeholder="Ex: Victor"
+      required
+    />
+  </label>
+
+  <label>
+    Nom de l'auteur :
+    <input
+      onChange={(e) => setLastName(e.target.value)}
+      value={lastName}
+      type="text"
+      placeholder="Ex: Hugo"
+      required
+    />
+  </label>
+  
+  <button type="submit">Ajouter</button>
+</form>
     </div>
   );
 }
