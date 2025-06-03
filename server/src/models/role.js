@@ -11,7 +11,9 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // Un role qulifier plusieur utilisateur
-      Role.hasMany(models.User, { as:'users'});
+      Role.hasMany(models.User, { 
+        foreignKey:'roleId',
+        as:'users'});
     }
   }
   Role.init({
