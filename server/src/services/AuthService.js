@@ -62,13 +62,17 @@ class AuthService{
             throw err;
         }
         //verifier si le mdp coeerespond au mdp en db (BL)
-        const isMatch = bcrypt.compare(password, existingUser.password);
-        if (isMatch) {
-            console.log("mot de passe correct");
-        } else {
-            console.log("mot de passe incorrect");
+        const isMatch = await bcrypt.compare(password, existingUser.password);
+        if (!isMatch) {
+            const err = new Error("Les mots de passe ne correpondent pas");
+            err.statusCode = 401;
+            throw err;
         }
-
+        return ({
+            id:existingUser.id,
+            login:existingUser.login,
+            roleId:existingUser.roleId
+        });
     }
 }
 module.exports = AuthService;
