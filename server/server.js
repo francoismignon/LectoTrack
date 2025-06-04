@@ -2,6 +2,7 @@ const express = require('express');
 const env = require('dotenv');
 const db = require('./src/models');
 const bcrypt = require('bcrypt');
+const UserRepository = require('./src/Repositories/UserRepository');
 
 
 env.config();
@@ -9,6 +10,7 @@ const app = express();
 app.use(express.json());//pour lire le requ.body en JSON
 const PORT = process.env.PORT;
 const saltRound = 10; //nbr de salage
+const userRepository = new UserRepository(db.User);
 
 
 //Routes
@@ -18,12 +20,8 @@ app.post("/api/v1/auth/register", async (req, res)=>{
     const loginFormatted = login.slice(0,1).toUpperCase() + login.slice(1).toLowerCase();
     
     try {
-        //Verifier si l'utilisateur existe deja (BL)
-        const existingUser = await db.User.findOne({
-            where:{
-                login:loginFormatted
-            }
-        });
+  
+        const existingUser = await userRepository.findByLogin(loginFormatted);
         
         if(existingUser){
             return res.status(400).json({ message: "L'utilisateur existe déja" });
@@ -35,14 +33,17 @@ app.post("/api/v1/auth/register", async (req, res)=>{
         }
         //Hachage (BL)
         const hashPassword = await bcrypt.hash(password, saltRound);
-        //enregister le nouvel utilisateur(DAL)
-        const newUser = await db.User.create({
+    
+        const newUser = await userRepository.create({
             login: loginFormatted,
             password: hashPassword
         });
-        res.status(201).json({ user: {
-            id:newUser.id,
-            login:newUser.login
+
+        res.status(201).json({ 
+            user: {
+                id:newUser.id,
+                login:newUser.login,
+                roleId:newUser.roleId
         }});
 
     } catch (error) {
