@@ -7,8 +7,8 @@ module.exports = {
     const saltRounds = 10;
     await queryInterface.bulkInsert('Users',[
       {
-        login:'admin',
-        password:await bcrypt.hash('admin', saltRounds),
+        login:'Admin',
+        password:await bcrypt.hash('Admin', saltRounds),
         roleId:1,
         createdAt: new Date(),
         updatedAt: new Date()
@@ -18,7 +18,7 @@ module.exports = {
 
   async down (queryInterface, Sequelize) {
     await queryInterface.bulkDelete('Users', {
-      login:'admin'
+      login:'Admin'
     },{});
   }
 };

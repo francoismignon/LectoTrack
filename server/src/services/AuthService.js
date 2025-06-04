@@ -5,15 +5,23 @@ class AuthService{
     constructor(userRepository){
         this.userRepository = userRepository;
     }
+
+    async isExistingUser(login){
+        return await this.userRepository.findByLogin(login);
+    }
+
+    formatLogin(login) {
+        return login.slice(0,1).toUpperCase() + login.slice(1).toLowerCase();
+    }
     
     async create(login, password, confirmPassword  ){
         const saltRound = 10;
         //formater correctement l'entrée (BL)
-        const loginFormatted = login.slice(0,1).toUpperCase() + login.slice(1).toLowerCase();
+        const loginFormatted = this.formatLogin(login);
 
         //Verifie si l'utilisateur existe déja
-        const existingUser = await this.userRepository.findByLogin(loginFormatted);
-        
+        this.isExistingUser(loginFormatted);
+        const existingUser = await this.isExistingUser(loginFormatted);
         if(existingUser){
             //Creation manuel d'un code d'erreur, il sera recupere dans le try/catch pour pouvoir renvoyer correctement un message json
             const err = new Error("L'utilisateur existe déja");
@@ -40,6 +48,27 @@ class AuthService{
             login:newUser.login,
             roleId:newUser.roleId
         });
+    }
+    async login(login, password){
+        //formater correctement l'entrée (BL)
+        const loginFormatted = this.formatLogin(login);
+
+        //Verifie si l'utilisateur existe déja
+        const existingUser = await this.isExistingUser(loginFormatted);
+        //erreur si l'utilisateur n'existe pas
+        if(!existingUser){
+            const err = new Error("L'utilisateur n'existe pas encore");
+            err.statusCode = 401;
+            throw err;
+        }
+        //verifier si le mdp coeerespond au mdp en db (BL)
+        const isMatch = bcrypt.compare(password, existingUser.password);
+        if (isMatch) {
+            console.log("mot de passe correct");
+        } else {
+            console.log("mot de passe incorrect");
+        }
+
     }
 }
 module.exports = AuthService;
