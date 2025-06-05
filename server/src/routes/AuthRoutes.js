@@ -2,7 +2,7 @@ const express = require('express');
 const db = require('../models/index.js');
 const UserRepository = require('../Repositories/UserRepository.js');
 const AuthService = require('../services/AuthService.js');
-const AuthController = require('../controllers/AuthContoller.js');
+const AuthController = require('../controllers/AuthController.js');
 
 const router = express();
 const userRepository = new UserRepository(db.User);
@@ -11,6 +11,10 @@ const authController = new AuthController(authService);
 
 router.post("/register", (req, res)=>{
     authController.register(req, res);
+});
+
+router.post("/login", (req, res) => {
+    authController.login(req, res);
 });
 
 module.exports = router;

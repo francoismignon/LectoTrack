@@ -5,7 +5,7 @@ const db = require('./src/models');
 const bcrypt = require('bcrypt');
 const UserRepository = require('./src/Repositories/UserRepository.js');
 const AuthService = require('./src/services/AuthService.js');
-const AuthController = require('./src/controllers/AuthContoller.js');
+const AuthController = require('./src/controllers/AuthController.js');
 
 
 
@@ -17,12 +17,16 @@ const PORT = process.env.PORT;
 const saltRound = 10;
 const userRepository = new UserRepository(db.User);
 const authService = new AuthService(userRepository);
-const authContoller = new AuthController(authService);
+const authController = new AuthController(authService);
 
-//Routes
+//Routes Auth
 app.use("/api/v1/auth", authRoutes);
-app.post("/api/v1/auth/login", async (req, res) => {
-    authContoller.login(req, res);
+
+app.post("/api/v1/auth/logout", (req, res)=>{
+    //suppression du token jwt coté client
+    res.status(200).json({
+        message: "Deconnecter avec succes"
+    });
 });
 
 app.listen(PORT, () => {
