@@ -21,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
         as:'user'
       });
       // une lecture contient plusieur commentaires
-      Reading.hasMany(models.Comment, { as:'comments'});
+      Reading.hasMany(models.Comment, {foreignKey:'readingId', as:'comments'});
       //Une lecture peut avoir different status
       Reading.belongsTo(models.Status, {
         foreignKey:'statusId',

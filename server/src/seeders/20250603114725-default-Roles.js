@@ -19,5 +19,6 @@ module.exports = {
 
   async down (queryInterface, Sequelize) {
     await queryInterface.bulkDelete('Roles', null, {});
+    await queryInterface.sequelize.query('ALTER SEQUENCE "Roles_id_seq" RESTART WITH 1;');
   }
 };

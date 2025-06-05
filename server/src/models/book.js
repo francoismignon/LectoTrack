@@ -16,7 +16,7 @@ module.exports = (sequelize, DataTypes) => {
         as:'author'
       });
       //un livre a plusieur lecture
-      Book.hasMany(models.Reading, { as: 'readings'});
+      Book.hasMany(models.Reading, {foreignKey:'bookId', as: 'readings'});
 
       //un livre a plusieur catégories (many to many)
       Book.belongsToMany(models.Category, {

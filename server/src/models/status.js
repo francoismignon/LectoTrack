@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // Un status defini plusieur lecture
-      Status.hasMany(models.Reading, { as:'readings'});
+      Status.hasMany(models.Reading, { foreignKey:'statusId', as:'readings'});
     }
   }
   Status.init({

@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // Un utilisateur a plusieur lecture en cours
-      User.hasMany(models.Reading, { as: 'readings'});
+      User.hasMany(models.Reading, {foreignKey:'userId', as: 'readings'});
       // un utilisateur est qualifier par un seul role
       User.belongsTo(models.Role, {
         foreignKey:'roleId',

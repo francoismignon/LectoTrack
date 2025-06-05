@@ -39,5 +39,6 @@ module.exports = {
      * await queryInterface.bulkDelete('People', null, {});
      */
     await queryInterface.bulkDelete('Statuses', null, {});
+    await queryInterface.sequelize.query('ALTER SEQUENCE "Statuses_id_seq" RESTART WITH 1;');
   }
 };

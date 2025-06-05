@@ -20,5 +20,6 @@ module.exports = {
     await queryInterface.bulkDelete('Users', {
       login:'Admin'
     },{});
+    await queryInterface.sequelize.query('ALTER SEQUENCE "Users_id_seq" RESTART WITH 1;');
   }
 };
