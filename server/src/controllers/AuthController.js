@@ -25,5 +25,12 @@ class AuthController {
             res.status(error.statusCode || 500).json({ error: error.message });
         }
     }
+
+    async logout(req, res) {
+        //suppression du token jwt coté client
+        res.status(200).json({
+            message: "Deconnecter avec succes"
+        });
+    }
 }
 module.exports = AuthController;

@@ -22,13 +22,6 @@ const authController = new AuthController(authService);
 //Routes Auth
 app.use("/api/v1/auth", authRoutes);
 
-app.post("/api/v1/auth/logout", (req, res)=>{
-    //suppression du token jwt coté client
-    res.status(200).json({
-        message: "Deconnecter avec succes"
-    });
-});
-
 app.listen(PORT, () => {
     console.log(`Le serveur a démarrer sur : http://localhost:${PORT}`);
 });
