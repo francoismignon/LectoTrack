@@ -5,12 +5,12 @@ class UserRepository {
     }
 
     async findByLogin(login) {
-        return this.User.findOne({ where: { login: login } });
+        return await this.User.findOne({ where: { login: login } });
     }
 
 
     async create(userData) {
-        return this.User.create(userData);
+        return await this.User.create(userData);
     }
 }
 module.exports = UserRepository;

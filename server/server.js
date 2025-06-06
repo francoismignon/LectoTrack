@@ -1,5 +1,5 @@
 const express = require('express');
-const env = require('dotenv');
+const env = require('dotenv').config();
 const authRoutes = require('./src/routes/AuthRoutes.js');
 const db = require('./src/models');
 const bcrypt = require('bcrypt');
@@ -7,20 +7,25 @@ const UserRepository = require('./src/Repositories/UserRepository.js');
 const AuthService = require('./src/services/AuthService.js');
 const AuthController = require('./src/controllers/AuthController.js');
 const {checkTokenJwt} = require('./src/middlewares/authMiddlewares.js');
-const { where } = require('sequelize');
+const AuthorRepository = require('./src/Repositories/AuthorRepository.js');
+const CategoryRepository = require('./src/Repositories/CategoryRepository.js');
+const BookRepository = require('./src/Repositories/BookRepository.js');
+const BookCategoryRepository = require('./src/Repositories/BookCategoryRepository.js');
+const ReadingRepository = require('./src/Repositories/ReadingRepository.js');
 
 
-
-
-env.config();
 const app = express();
 app.use(express.json());//pour lire le requ.body en JSON
 const PORT = process.env.PORT;
 const saltRound = 10;
 const userRepository = new UserRepository(db.User);
+const categoryRepository = new CategoryRepository(db.Category);
+const authorRepository = new AuthorRepository(db.Author);
+const bookRepository = new BookRepository(db.Book);
+const readingRepository = new ReadingRepository(db.Reading);
+const bookCategoryRepository = new BookCategoryRepository(db.BookCategory);
 const authService = new AuthService(userRepository);
 const authController = new AuthController(authService);
-
 
 
 app.post("/api/v1/readings", checkTokenJwt, async (req, res) => {
@@ -39,56 +44,39 @@ app.post("/api/v1/readings", checkTokenJwt, async (req, res) => {
 
     try {
         //Verifie si l'auteur est présent en DB
-        const [author] = await db.Author.findOrCreate({
-            where:{name:authorName}, //critere de recherche
-            defaults:{name:authorName} //valeur ajoutée si pas trouvé
-        });
+        const [author] = await authorRepository.getOrCreateAuthorByName(authorName);
 
         const {id: authorId} = author //on extrait l'id de l'autheur pour l'ajouter au livre
 
         //On verifie la liste des categorie pour les enregister dans la DB
         const categoriesList = [];
         for (let i = 0; i < categories.length; i++) {
-            const [genre] = await db.Category.findOrCreate({
-                where: {
-                    name: categories[i]
-                },
-                defaults: {
-                    name: categories[i]
-                }
-            });
+            const [genre] = await categoryRepository.getOrCreateCategory(categories[i]);
             categoriesList.push(genre);
         }
        //Cree un tableau des ids des genre (besoin pour FK)
        const categoriesListIds = categoriesList.map(cat => cat.id);
 
-        const [book] = await db.Book.findOrCreate({
-            where:{ 
-                title:title,
-                authorId:authorId
-             },
-            defaults:{
-                authorId: authorId,
-                nbrPages: nbrPages,
-                coverUrl:coverUrl,
-                title:title
-            }
-        });
+       //Creation d'un objet livre
+        const bookData = {
+            authorId: authorId,
+            title: title,
+            nbrPages: nbrPages,
+            coverUrl: coverUrl
+        };
+        //Mise a jour dela table des livres
+        const [book] = await bookRepository.getOrCreateBook(bookData);
+        
 
         const {id: bookId} = book;
        //Mettre a jour la tables de jointure BookCategory on boucle les categories et on ajoute le meme livre pour chaque
        const bookCategory = [];
        for(let i = 0; i < categoriesListIds.length; i++){
-        const [listBookIdCatId] = await db.BookCategory.findOrCreate({
-            where:{
-                bookId:bookId,
-                categoryId:categoriesListIds[i]
-            },
-            defaults:{
-                bookId:bookId,
-                categoryId:categoriesListIds[i]
-            }
-        });
+        const BookCategoryData = {
+            bookId:bookId,
+            categoryId:categoriesListIds[i]
+        };
+        const [listBookIdCatId] = await bookCategoryRepository.getOrCreateBookCategory(BookCategoryData);
         bookCategory.push(listBookIdCatId);
        }
         
@@ -104,13 +92,15 @@ app.post("/api/v1/readings", checkTokenJwt, async (req, res) => {
             err.statusCode = 409;
             throw err;
         }
-        //on cree la nouvelle lecture
-        const readings = await db.Reading.create({
+        //creation objet Lecture
+        const readingData = {
             bookId:bookId,
             userId:userId,
             progress:0
             // le status par defaut (non commencé) est ajouter par migration
-        });
+        }
+        //on cree la nouvelle lecture
+        const readings = readingRepository.create(readingData);
         res.status(201).json({message : "La lecture à bien débuté"});
     } catch (error) {
         res.status(error.statusCode || 500).json({ error: error.message });
