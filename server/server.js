@@ -15,6 +15,8 @@ const ReadingRepository = require('./src/Repositories/ReadingRepository.js');
 const AuthorService = require('./src/services/AuthorService.js');
 const CategoryService = require('./src/services/CategoryService.js');
 const BookService = require('./src/services/BookService.js');
+const BookCategoryService = require('./src/services/BookCategoryService.js');
+const ReadingService = require('./src/services/ReadingService.js');
 
 
 const app = express();
@@ -31,6 +33,8 @@ const authService = new AuthService(userRepository);
 const authorService = new AuthorService(authorRepository);
 const categoryService = new CategoryService(categoryRepository);
 const bookService = new BookService(bookRepository);
+const bookCategoryService = new BookCategoryService(bookCategoryRepository);
+const readingService = new ReadingService(readingRepository);
 const authController = new AuthController(authService);
 
 
@@ -64,37 +68,23 @@ app.post("/api/v1/readings", checkTokenJwt, async (req, res) => {
         });
 
        //Mettre a jour la tables de jointure BookCategory on boucle les categories et on ajoute le meme livre pour chaque
-       const bookCategory = [];
-       for(let i = 0; i < categoriesListIds.length; i++){
-        const BookCategoryData = {
-            bookId:bookId,
-            categoryId:categoriesListIds[i]
-        };
-        const [listBookIdCatId] = await bookCategoryRepository.getOrCreateBookCategory(BookCategoryData);
-        bookCategory.push(listBookIdCatId);
-       }
+       bookCategoryService.getOrCreateBookCategory(bookId, categoriesListIds);
         
         // Vérifie si l'utilisateur a déjà une lecture de ce livre
-        const existingReading = await db.Reading.findOne({
-            where:{
-                bookId:bookId,
-                userId:userId
-            }
-        });
+        const existingReading = await readingService.getBookByIdAndUserId(bookId, userId);
         if(existingReading){
             const err = new Error("Une lecture pour ce livre est déja en cours");
             err.statusCode = 409;
             throw err;
         }
-        //creation objet Lecture
+        //on cree la nouvelle lecture
         const readingData = {
             bookId:bookId,
             userId:userId,
             progress:0
-            // le status par defaut (non commencé) est ajouter par migration
+            //le status par defaut (non commencé) est ajouter par migration
         }
-        //on cree la nouvelle lecture
-        const readings = readingRepository.create(readingData);
+        const reading = await readingService.create(readingData);
         res.status(201).json({message : "La lecture à bien débuté"});
     } catch (error) {
         res.status(error.statusCode || 500).json({ error: error.message });
