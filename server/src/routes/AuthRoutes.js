@@ -4,7 +4,7 @@ const UserRepository = require('../Repositories/UserRepository.js');
 const AuthService = require('../services/AuthService.js');
 const AuthController = require('../controllers/AuthController.js');
 
-const router = express();
+const router = express.Router();
 const userRepository = new UserRepository(db.User);
 const authService = new AuthService(userRepository);
 const authController = new AuthController(authService);
