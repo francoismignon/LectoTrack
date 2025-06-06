@@ -3,7 +3,7 @@ class AuthController {
         this.authService = authService;
     }
 
-    async register(req, res) {
+    register = async (req, res) => {
         const { login, password, confirmPassword } = req.body;
         try {
             const newUser = await this.authService.create(login, password, confirmPassword);
@@ -14,7 +14,7 @@ class AuthController {
         }
     }
 
-    async login(req, res) {
+    login = async (req, res) => {
         const { login, password } = req.body;
         try {
             const existingUser = await this.authService.login(login, password);
@@ -26,7 +26,7 @@ class AuthController {
         }
     }
 
-    async logout(req, res) {
+    logout = async (req, res) => {
         //suppression du token jwt coté client
         res.status(200).json({
             message: "Deconnecter avec succes"

@@ -9,7 +9,7 @@ app.use(express.json());//pour lire le requ.body en JSON
 const PORT = process.env.PORT;
 
 
-app.use("/api/v1/readings", ReadingRoutes);
+
 
 // app.get("/api/v1/readings", checkToken, async (req, res) => {
 //     const { id, login } = req.user; //Nom d'utilisateur connecté + id
@@ -44,6 +44,7 @@ app.use("/api/v1/readings", ReadingRoutes);
 
 //Routes Auth
 app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/readings", ReadingRoutes);
 
 app.listen(PORT, () => {
     console.log(`Le serveur a démarrer sur : http://localhost:${PORT}`);

@@ -9,15 +9,8 @@ const userRepository = new UserRepository(db.User);
 const authService = new AuthService(userRepository);
 const authController = new AuthController(authService);
 
-router.post("/register", (req, res)=>{
-    authController.register(req, res);
-});
+router.post("/register", authController.register);
+router.post("/login",authController.login);
+router.post("/logout", authController.logout);
 
-router.post("/login", (req, res) => {
-    authController.login(req, res);
-});
-
-router.post("/logout", (req, res)=>{
-    authController.logout(req, res);
-});
 module.exports = router;
