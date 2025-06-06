@@ -12,6 +12,9 @@ const CategoryRepository = require('./src/Repositories/CategoryRepository.js');
 const BookRepository = require('./src/Repositories/BookRepository.js');
 const BookCategoryRepository = require('./src/Repositories/BookCategoryRepository.js');
 const ReadingRepository = require('./src/Repositories/ReadingRepository.js');
+const AuthorService = require('./src/services/AuthorService.js');
+const CategoryService = require('./src/services/CategoryService.js');
+const BookService = require('./src/services/BookService.js');
 
 
 const app = express();
@@ -25,13 +28,13 @@ const bookRepository = new BookRepository(db.Book);
 const readingRepository = new ReadingRepository(db.Reading);
 const bookCategoryRepository = new BookCategoryRepository(db.BookCategory);
 const authService = new AuthService(userRepository);
+const authorService = new AuthorService(authorRepository);
+const categoryService = new CategoryService(categoryRepository);
+const bookService = new BookService(bookRepository);
 const authController = new AuthController(authService);
 
 
 app.post("/api/v1/readings", checkTokenJwt, async (req, res) => {
-    const { title, authorName, coverUrl, nbrPages, categories } = req.body;
-    const {id:userId} = req.user;
-
     //verifie si l'autheur est present en DB
         //si non => on le cree
         //si oui => on verifie si la les genre sont bien en DB
@@ -42,33 +45,24 @@ app.post("/api/v1/readings", checkTokenJwt, async (req, res) => {
                                         // si non, on cree les association
                                         // si oui => on cree une nouvelle lecture
 
-    try {
-        //Verifie si l'auteur est présent en DB
-        const [author] = await authorRepository.getOrCreateAuthorByName(authorName);
+    const { title, authorName, coverUrl, nbrPages, categories } = req.body;
+    const {id:userId} = req.user;
 
-        const {id: authorId} = author //on extrait l'id de l'autheur pour l'ajouter au livre
+    try {
+        //Verifie si l'auteur est présent en DB si pas on le cree
+        const authorId = await authorService.getOrCreateAuthor(authorName);
 
         //On verifie la liste des categorie pour les enregister dans la DB
-        const categoriesList = [];
-        for (let i = 0; i < categories.length; i++) {
-            const [genre] = await categoryRepository.getOrCreateCategory(categories[i]);
-            categoriesList.push(genre);
-        }
-       //Cree un tableau des ids des genre (besoin pour FK)
-       const categoriesListIds = categoriesList.map(cat => cat.id);
+        const categoriesListIds = await categoryService.getOrCreateCategory(categories);
 
        //Creation d'un objet livre
-        const bookData = {
+        const bookId = await bookService.getOrCreateBook({
             authorId: authorId,
             title: title,
             nbrPages: nbrPages,
             coverUrl: coverUrl
-        };
-        //Mise a jour dela table des livres
-        const [book] = await bookRepository.getOrCreateBook(bookData);
-        
+        });
 
-        const {id: bookId} = book;
        //Mettre a jour la tables de jointure BookCategory on boucle les categories et on ajoute le meme livre pour chaque
        const bookCategory = [];
        for(let i = 0; i < categoriesListIds.length; i++){
