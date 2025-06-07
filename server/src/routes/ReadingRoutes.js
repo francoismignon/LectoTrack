@@ -38,7 +38,7 @@ const readingController = new ReadingController(
     bookCategoryService
 );
 
-
+router.get("/:id", checkTokenJwt, readingController.getReadingById);
 router.post("/", checkTokenJwt, readingController.createReading);
 router.get("/", checkTokenJwt, readingController.getReadings);
 
