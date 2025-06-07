@@ -4,11 +4,20 @@ const authRoutes = require('./src/routes/AuthRoutes.js');
 const ReadingRoutes = require('./src/routes/ReadingRoutes.js');
 const { checkTokenJwt } = require('./src/middlewares/authMiddlewares.js');
 const db = require('./src/models');
+const ReadingRepository = require('./src/Repositories/ReadingRepository.js');
+const ReadingService = require('./src/services/ReadingService.js');
 
 
 const app = express();
 app.use(express.json());//pour lire le requ.body en JSON
 const PORT = process.env.PORT;
+const readingRepository = new ReadingRepository(
+    db.Reading, 
+    db.Book,
+    db.Author,
+    db.Status
+);
+const readingService = new ReadingService(readingRepository);
 
 
 
@@ -25,48 +34,7 @@ app.get("/api/v1/readings", checkTokenJwt, async (req, res) => {
         //filtée par status
 
         //chercher en DB toutes les lecture de cet utilisateur
-        const readings = await db.Reading.findAll({
-            where: {
-                userId: id
-            },
-            attributes: ['progress'],
-            include: [
-                {
-                    model: db.Book,
-                    as:'book',
-                    attributes: ['title', 'coverUrl'],
-                    include: [
-                        {
-                            model: db.Author,
-                            as:'author',
-                            attributes: ['name']
-                        },
-                        ///////////////si j'ai le temp, on fera un triage par categorie
-
-                        // genre?{ //si le tri par genre est dans les paramettre de requete, on les ajoute
-                        //     model: db.BookCategory,
-                        //     as:'bookCategories',
-                        //     include:[
-                        //         {
-                        //             model:db.Category,
-                        //             as:'category',
-                        //             attributes: ['name'],
-                        //             order:[['name', 'ASC']]
-                        //         }
-                        //     ]
-                        // }:undefined // si pas, on les ajoute pas
-                    ]
-                },
-                {
-                    model: db.Status,
-                    as:'status',
-                    attributes: ['name'],
-                    where: status?{
-                        name:status //on trie les lecture par status
-                    }:undefined //si il n'y a pas de parametre(donc si on vx tout)
-                }
-            ]
-        });
+        const readings = await readingService.getAll(id, status);
         res.status(200).json(readings);
 
     } catch (error) {

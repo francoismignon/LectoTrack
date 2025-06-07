@@ -10,5 +10,8 @@ class ReadingService{
         //on cree la nouvelle lecture
         return await this.readingRepository.create(reading);
     }
+    async getAll(user, status){
+        return await this.readingRepository.getAll(user, status);
+    }
 }
 module.exports = ReadingService;
