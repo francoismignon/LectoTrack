@@ -6,6 +6,23 @@ class ReadingController{
         this.bookService = bookService;
         this.bookCategoryService = bookCategoryService;
     }
+
+    delete = async (req, res) => {
+        //on supprime si le lecteur est bien autenfither
+        const { id: userId } = req.user;
+        const { id: idReading } = req.params;
+
+        try {
+            //juste pour le fun, je voudrai d'abore avoir le titre du livre pour personnaliser le massage
+            const { book: { title } } = await this.readingService.getReadingIncludeBook(idReading, userId); //on destucture directement l'ojet sequelize dans la contante pour n'avoir que le titre
+            const isDelete = await this.readingService.delete(idReading, userId);
+            // console.log(isDelete);
+            (isDelete > 0) && res.status(200).json({ message: `${title} à bien été supprimée avec succes` }); // dans une ternaire, si il n'y a pas de faux, on px mettre directement && a la place de ?
+
+        } catch (error) {
+            res.status(error.statusCode || 500).json({ error: error.message });
+        }
+    }
       //verifie si l'autheur est present en DB
         //si non => on le cree
         //si oui => on verifie si la les genre sont bien en DB

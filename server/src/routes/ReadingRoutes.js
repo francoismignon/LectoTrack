@@ -38,6 +38,8 @@ const readingController = new ReadingController(
     bookCategoryService
 );
 
+
+router.delete("/:id", checkTokenJwt, readingController.delete);
 router.get("/:id", checkTokenJwt, readingController.getReadingById);
 router.post("/", checkTokenJwt, readingController.createReading);
 router.get("/", checkTokenJwt, readingController.getReadings);
