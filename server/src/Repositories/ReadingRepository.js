@@ -6,6 +6,31 @@ class ReadingRepository {
         this.Status = StatusModel;
     }
 
+    async detele(idReading, userId){
+        return await this.Reading.destroy({
+            where: {
+                id: idReading,
+                userId: userId
+            }
+        })
+    }
+
+    async getReadingIncludeBook(idReading, userId) {
+        return await this.Reading.findOne({ 
+            where: {
+                id: idReading,
+                userId: userId
+            },
+            include: [
+                {
+                    model: this.Book,
+                    as: 'book',
+                    attributes: ['title']
+                }
+            ]
+        });
+    }
+
     async create(reading) {
         return await this.Reading.create(reading);
     }

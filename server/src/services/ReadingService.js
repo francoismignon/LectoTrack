@@ -2,6 +2,15 @@ class ReadingService{
     constructor(ReadingRepository){
         this.readingRepository = ReadingRepository;
     }
+
+    async delete(idReading, userId){
+        return await this.readingRepository.detele(idReading, userId);
+    }
+
+    async getReadingIncludeBook(idReading, userId){
+        return await this.readingRepository.getReadingIncludeBook(idReading, userId)
+    }
+
     async getBookByIdAndUserId(bookId, userId){
         return await this.readingRepository.getBookByIdAndUserId(bookId, userId);
     }
