@@ -18,7 +18,12 @@ const router = express.Router();
 const categoryRepository = new CategoryRepository(db.Category);
 const authorRepository = new AuthorRepository(db.Author);
 const bookRepository = new BookRepository(db.Book);
-const readingRepository = new ReadingRepository(db.Reading);
+const readingRepository = new ReadingRepository(
+    db.Reading,
+    db.Book,
+    db.Author,
+    db.Status
+);
 const bookCategoryRepository = new BookCategoryRepository(db.BookCategory);
 const authorService = new AuthorService(authorRepository);
 const categoryService = new CategoryService(categoryRepository);
@@ -35,4 +40,6 @@ const readingController = new ReadingController(
 
 
 router.post("/", checkTokenJwt, readingController.createReading);
+router.get("/", checkTokenJwt, readingController.getReadings);
+
 module.exports = router;

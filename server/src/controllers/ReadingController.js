@@ -57,5 +57,24 @@ class ReadingController{
             res.status(error.statusCode || 500).json({ error: error.message });
         }
     }
+    getReadings = async (req, res) =>{
+        try {
+        const { id } = req.user; //Nom d'utilisateur connecté + id
+        const {status} = req.query; //pour les filtre et les tris
+
+        //toutes les lecture en cours pour l'utilisateur connecter
+        //pour chaque => image du livre, titre du livre, auteur du livres, pourcentage de progression et status de lecture
+
+        //triée par genre
+        //filtée par status
+
+        //chercher en DB toutes les lecture de cet utilisateur
+        const readings = await this.readingService.getAll(id, status);
+        res.status(200).json(readings);
+
+    } catch (error) {
+        res.status(error.statusCode || 500).json({ error: error.message });
+    }
+    }
 }
 module.exports = ReadingController;
