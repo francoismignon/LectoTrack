@@ -16,7 +16,7 @@ const PORT = process.env.PORT;
 app.get("/api/v1/readings", checkTokenJwt, async (req, res) => {
     try {
         const { id } = req.user; //Nom d'utilisateur connecté + id
-        const {status, genre} = req.query; //pour les filtre et les tris
+        const {status} = req.query; //pour les filtre et les tris
 
         //toutes les lecture en cours pour l'utilisateur connecter
         //pour chaque => image du livre, titre du livre, auteur du livres, pourcentage de progression et status de lecture
@@ -40,7 +40,21 @@ app.get("/api/v1/readings", checkTokenJwt, async (req, res) => {
                             model: db.Author,
                             as:'author',
                             attributes: ['name']
-                        }
+                        },
+                        ///////////////si j'ai le temp, on fera un triage par categorie
+
+                        // genre?{ //si le tri par genre est dans les paramettre de requete, on les ajoute
+                        //     model: db.BookCategory,
+                        //     as:'bookCategories',
+                        //     include:[
+                        //         {
+                        //             model:db.Category,
+                        //             as:'category',
+                        //             attributes: ['name'],
+                        //             order:[['name', 'ASC']]
+                        //         }
+                        //     ]
+                        // }:undefined // si pas, on les ajoute pas
                     ]
                 },
                 {

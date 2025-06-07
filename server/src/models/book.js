@@ -25,6 +25,11 @@ module.exports = (sequelize, DataTypes) => {
         otherKey:'categoryId',
         as:'categories'
       });
+      //un livre a plusieur "BookCategory"
+      Book.hasMany(models.BookCategory,{
+        foreignKey:'bookId',
+        as:'bookCategories'
+      })
     }
   }
   Book.init({
