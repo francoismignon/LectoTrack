@@ -13,5 +13,8 @@ class ReadingService{
     async getAll(user, status){
         return await this.readingRepository.getAll(user, status);
     }
+    async getById(idReading, userId){
+        return await this.readingRepository.getById(idReading, userId); 
+    }
 }
 module.exports = ReadingService;

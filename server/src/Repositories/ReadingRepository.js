@@ -62,5 +62,31 @@ class ReadingRepository {
             ]
         });
     }
+    async getById (idReading, userId){
+        console.log(this.Book.associations);     // doit contenir 'author'
+        console.log(this.Reading.associations);  // doit contenir 'book'
+       return await this.Reading.findOne({
+            where: {
+                id: idReading,
+                userId: userId
+            },
+            attributes:['id', 'progress'],
+            include:[
+                {
+                    model:this.Book,
+                    as:'book',
+                    attributes:['title', 'coverUrl'],
+                    include:[
+                        {
+                            model: this.Author,
+                            as:'author',
+                            attributes:['name']
+                        }
+                    ]
+
+                }
+            ]
+        }); 
+    }
 }
 module.exports = ReadingRepository;
