@@ -100,7 +100,7 @@ class ReadingRepository {
                 {
                     model:this.Book,
                     as:'book',
-                    attributes:['title', 'coverUrl'],
+                    attributes:['title', 'coverUrl', 'nbrPages'],
                     include:[
                         {
                             model: this.Author,

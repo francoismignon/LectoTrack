@@ -94,7 +94,7 @@ class ReadingController{
         }
     }
     getReadingById = async (req, res) => {
-        //une seule requete sequelize qui va chercher la lecture complete de l'utilisateur en utilisant le parametre id du livre passer dans l'url.
+        //une seule requete sequelize qui va chercher la lecture complete de l'utilisateur en utilisant le parametre id de le lecture passer dans l'url.
         // les tables a joindres sont Books, Authors
         //Les elements a afficher:
         // progression, titre, autheur, couverture du livre
