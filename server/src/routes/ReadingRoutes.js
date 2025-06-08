@@ -1,6 +1,6 @@
 const express = require('express');
 const db = require('../models');
-const {checkTokenJwt} = require('../middlewares/authMiddlewares.js');
+const { checkTokenJwt } = require('../middlewares/authMiddlewares.js');
 const AuthorRepository = require('../Repositories/AuthorRepository.js');
 const CategoryRepository = require('../Repositories/CategoryRepository.js');
 const BookRepository = require('../Repositories/BookRepository.js');
@@ -12,6 +12,7 @@ const BookService = require('../services/BookService.js');
 const BookCategoryService = require('../services/BookCategoryService.js');
 const ReadingService = require('../services/ReadingService.js');
 const ReadingController = require('../controllers/ReadingController.js');
+const CommentRepositrory = require('../Repositories/CommentRepository.js');
 
 
 const router = express.Router();
@@ -29,7 +30,11 @@ const authorService = new AuthorService(authorRepository);
 const categoryService = new CategoryService(categoryRepository);
 const bookService = new BookService(bookRepository);
 const bookCategoryService = new BookCategoryService(bookCategoryRepository);
-const readingService = new ReadingService(readingRepository);
+const commentRepository = new CommentRepositrory(db.Comment);
+const readingService = new ReadingService(
+    readingRepository,
+    commentRepository
+);
 const readingController = new ReadingController(
     readingService,
     authorService,
@@ -38,7 +43,7 @@ const readingController = new ReadingController(
     bookCategoryService
 );
 
-
+router.patch("/:id", checkTokenJwt, readingController.update);
 router.delete("/:id", checkTokenJwt, readingController.delete);
 router.get("/:id", checkTokenJwt, readingController.getReadingById);
 router.post("/", checkTokenJwt, readingController.createReading);
