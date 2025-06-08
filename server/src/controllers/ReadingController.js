@@ -7,6 +7,27 @@ class ReadingController{
         this.bookCategoryService = bookCategoryService;
     }
 
+    update = async (req, res) => {
+        try {
+            //le lecture rentre un numero de page et un commentaire
+            const { nbrPages, pageNbr, content } = req.body;
+            const { id: userId } = req.user;
+            const { id: idReading } = req.params;
+
+            await this.readingService.update({
+                nbrPages,
+                pageNbr,
+                userId,
+                idReading,
+                content
+            });
+            res.status(200).json({ message: "le lecture a été mise a jour" });
+
+        } catch (error) {
+            res.status(error.statusCode || 500).json({ error: error.message });
+        }
+    }
+
     delete = async (req, res) => {
         //on supprime si le lecteur est bien autenfither
         const { id: userId } = req.user;
