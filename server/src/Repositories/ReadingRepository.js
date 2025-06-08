@@ -6,6 +6,19 @@ class ReadingRepository {
         this.Status = StatusModel;
     }
 
+    async update(reading) {
+        return await this.Reading.update({
+            progress: reading.progress,
+            statusId: reading.statusId
+        },
+            {
+                where: {
+                    id: reading.idReading,
+                    userId:reading.userId
+                }
+            });
+    }
+
     async detele(idReading, userId){
         return await this.Reading.destroy({
             where: {

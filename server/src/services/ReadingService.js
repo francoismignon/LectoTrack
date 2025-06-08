@@ -3,6 +3,10 @@ class ReadingService{
         this.readingRepository = ReadingRepository;
     }
 
+    async update(reading){
+        
+    }
+
     async delete(idReading, userId){
         return await this.readingRepository.detele(idReading, userId);
     }

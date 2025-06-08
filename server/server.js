@@ -4,11 +4,17 @@ const authRoutes = require('./src/routes/AuthRoutes.js');
 const ReadingRoutes = require('./src/routes/ReadingRoutes.js');
 const { checkTokenJwt } = require('./src/middlewares/authMiddlewares.js');
 const db = require('./src/models');
+const CommentRepositrory = require('./src/Repositories/CommentRepository.js');
+const CommentService =require('./src/Repositories/CommentRepository.js');
+const ReadingRepository = require('./src/Repositories/ReadingRepository.js');
 
 
 const app = express();
 app.use(express.json());//pour lire le requ.body en JSON
 const PORT = process.env.PORT;
+const commentRepository = new CommentRepositrory(db.Comment);
+const commentService = new CommentService(commentRepository);
+const readingRepository = new ReadingRepository(db.Reading);
 
 
 app.patch("/api/v1/readings/:id", checkTokenJwt, async (req, res)=>{
@@ -21,37 +27,29 @@ app.patch("/api/v1/readings/:id", checkTokenJwt, async (req, res)=>{
         //On calcule le pourcentage de progression
         const progress = Math.round((pageNbr/nbrPages) * 100); //suppression des chiffres apres la vigurle
         //On ajoute le commentaire et le numero de page dans la table Comments
-        await db.Comment.create({
+        await commentService.create({
             readingId:idReading,
-            pageNbr, //version abregée car c'est le meme nom
+            pageNbr,
             content
-        },);
+        });
         //On met a jour le pourcentage de progression et si la progression est superieur a 0% ou atteind 100%, on met a jour le status dans la tables Readings
             //0%=> non commencé
             //>0% => en cours
             //1àà% => Terrminer
         if (progress === 100) {
-            await db.Reading.update({
-                progress: progress,
-                statusId: 3
-            },
-                {
-                    where: {
-                        id: idReading,
-                        userId
-                    }
-                });
+            await readingRepository.update({
+                progress,
+                statusId: 3,
+                idReading,
+                userId
+            });
         } else if (progress > 0) {
-            await db.Reading.update({
-                progress: progress,
-                statusId: 2
-            },
-                {
-                    where: {
-                        id: idReading,
-                        userId
-                    }
-                });
+            await readingRepository.update({
+                progress,
+                statusId: 2,
+                idReading,
+                userId
+            });
         }
         res.status(200).json({message:"le lecture a été mise a jour"});
         
