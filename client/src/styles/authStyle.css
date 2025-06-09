@@ -1,0 +1,42 @@
+/* Centrage global */
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh; /* hauteur = 100% de la fenêtre */
+  margin: 0;
+}
+
+.form-container {
+  border: 1px solid #ccc;
+  padding: 16px;
+  width: 250px;
+  font-family: sans-serif;
+}
+
+label {
+  display: block;
+  margin-top: 8px;
+  font-size: 14px;
+}
+
+input {
+  width: 100%;
+  padding: 6px;
+  margin-top: 4px;
+  box-sizing: border-box;
+}
+
+button {
+  margin-top: 12px;
+  padding: 6px;
+  width: 100%;
+  border: 1px solid black;
+  background: white;
+  cursor: pointer;
+}
+
+p {
+  margin-top: 12px;
+  font-size: 14px;
+}
