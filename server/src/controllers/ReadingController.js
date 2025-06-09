@@ -7,6 +7,23 @@ class ReadingController{
         this.bookCategoryService = bookCategoryService;
     }
 
+    getAllComments = async (req, res) => {
+        try {
+            //les information dont j'ai besoin : couvetur, titre, auteur, liste des commentaires pour cette lecture
+            // sur cette vue j'ai juste besoin d'afficher la liste des commentaires de la lecture
+            const { id: userId } = req.user;
+            const { id: idReading } = req.params;
+
+            const comments = await this.readingService.getAllCommentsByReadingId({
+                idReading,
+                userId
+            });
+            res.status(200).json(comments);
+        } catch (error) {
+            res.status(error.statusCode || 500).json({ error: error.message });
+        }
+    }
+
     update = async (req, res) => {
         try {
             //le lecture rentre un numero de page et un commentaire

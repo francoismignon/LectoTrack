@@ -23,7 +23,8 @@ const readingRepository = new ReadingRepository(
     db.Reading,
     db.Book,
     db.Author,
-    db.Status
+    db.Status,
+    db.Comment
 );
 const bookCategoryRepository = new BookCategoryRepository(db.BookCategory);
 const authorService = new AuthorService(authorRepository);
@@ -43,6 +44,7 @@ const readingController = new ReadingController(
     bookCategoryService
 );
 
+router.get("/:id/comments", checkTokenJwt, readingController.getAllComments);
 router.patch("/:id", checkTokenJwt, readingController.update);
 router.delete("/:id", checkTokenJwt, readingController.delete);
 router.get("/:id", checkTokenJwt, readingController.getReadingById);
