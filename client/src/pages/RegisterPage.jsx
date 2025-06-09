@@ -1,25 +1,65 @@
-import React from 'react';
-import('../styles/authStyle.css');
+import React, { useState } from 'react';
+import axios from 'axios';
 
-function RegisterPage(){
-    return (
-    <div className="form-container">
-      <h2>Inscription</h2>
+function RegisterPage() {
 
-      <label htmlFor="login">Login</label>
-      <input type="text" id="login" placeholder="johndoe" />
+  const [login, setLogin] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
-      <label htmlFor="password">Mot de passe</label>
-      <input type="password" id="password" />
 
-      <label htmlFor="confirm">Mot de passe à nouveau</label>
-      <input type="password" id="confirm" />
+  async function handleSubmit(e){
+    
+    e.preventDefault();
+    if(password !== confirmPassword){
+      alert("Les mots de passe ne correspondent pas !");
+      return;
+    }
+    try {
+      const response = await axios.post('http://localhost:3000/api/v1/auth/register', {
+        login,
+        password,
+        confirmPassword
+      });
+      alert("Inscription réussie");
+      console.log("Inscription réussie :", response.data);
 
-      <button>Inscription</button>
+    } catch (error) {
+      console.log(error.message);
+    }
+  }
 
-      <p>Déjà utilisateur ?</p>
-      <button>Connexion</button>
+  function handleConfirmPasswordChange(e){
+    const {name, value} = e.target;
+    setConfirmPassword(value);
+  }
+  
+  function handlePasswordChange(e){
+    const {name, value} = e.target;
+    setPassword(value);
+  }
+
+  function handleLoginChange(e) {
+    const {name, value} = e.target;
+    setLogin(value);
+  }
+
+  return (
+    <div>
+      <h1>Inscription</h1>
+      <form onSubmit={handleSubmit}>
+        <label htmlFor="login">Pseudo</label>
+        <input onChange={handleLoginChange} type="text" id='login' name='login' required/>
+
+        <label htmlFor="password">Mot de passe</label>
+        <input onChange={handlePasswordChange} type="password" name="password" id="password" required/>
+
+        <label htmlFor="confirmPassword">Confirmation mot de passe</label>
+        <input onChange={handleConfirmPasswordChange} type="password" name="confirmPassword" id="confirmPassword" required/>
+        <input type="submit" value="Inscription" />
+      </form>
     </div>
   );
 }
+
 export default RegisterPage;

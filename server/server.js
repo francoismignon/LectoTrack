@@ -1,5 +1,6 @@
 const express = require('express');
 const env = require('dotenv').config();
+const cors = require('cors');
 const authRoutes = require('./src/routes/AuthRoutes.js');
 const readingRoutes = require('./src/routes/ReadingRoutes.js');
 const commentRoutes = require('./src/routes/CommentRoutes.js');
@@ -7,6 +8,7 @@ const commentRoutes = require('./src/routes/CommentRoutes.js');
 
 const app = express();
 app.use(express.json());//pour lire le requ.body en JSON
+app.use(cors());
 const PORT = process.env.PORT;
 
 
