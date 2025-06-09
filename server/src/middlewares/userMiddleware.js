@@ -22,7 +22,7 @@ checkRole = async (req, res, next) =>{
         }
         //Si le role est lecteur, l'utilisateur ne px pas acceder a cette route
         if (name === 'Lecteur') {
-            const err = new Error(`${name} n'as pas le droit d'acceder à cette page`);
+            const err = new Error(`${name} n'as pas le droit de faire cette action`);
             err.statusCode = 403;
             throw err;
         }
