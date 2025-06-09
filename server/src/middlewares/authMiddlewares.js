@@ -29,7 +29,4 @@ function checkTokenJwt(req, res, next) {
         res.status(error.statusCode || 500).json({ error: error.message });
     }
 }
-function checkRole(){
-
-}
-module.exports = {checkTokenJwt, checkRole};
+module.exports = checkTokenJwt;

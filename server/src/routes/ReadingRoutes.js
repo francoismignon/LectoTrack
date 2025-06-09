@@ -1,6 +1,6 @@
 const express = require('express');
 const db = require('../models');
-const { checkTokenJwt } = require('../middlewares/authMiddlewares.js');
+const checkTokenJwt = require('../middlewares/authMiddlewares.js');
 const AuthorRepository = require('../Repositories/AuthorRepository.js');
 const CategoryRepository = require('../Repositories/CategoryRepository.js');
 const BookRepository = require('../Repositories/BookRepository.js');
