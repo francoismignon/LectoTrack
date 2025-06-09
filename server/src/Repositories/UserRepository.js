@@ -1,7 +1,24 @@
 class UserRepository {
 
-    constructor(UserModel) {
+    constructor(UserModel, RoleModel) {
         this.User = UserModel;
+        this.Role = RoleModel
+    }
+
+    async getByIdWithRole(id) {
+        return await this.User.findOne({
+            where: {
+                id
+            },
+            attributes: ['login'],
+            include: [
+                {
+                    model: this.Role,
+                    as: 'role',
+                    attributes: ['name']
+                }
+            ]
+        });
     }
 
     async findByLogin(login) {

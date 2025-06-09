@@ -4,11 +4,22 @@ const authRoutes = require('./src/routes/AuthRoutes.js');
 const ReadingRoutes = require('./src/routes/ReadingRoutes.js');
 const { checkTokenJwt } = require('./src/middlewares/authMiddlewares.js');
 const db = require('./src/models');
+const UserRepository = require('./src/Repositories/UserRepository.js');
+const CommentRepositrory = require('./src/Repositories/CommentRepository.js');
+const UserService = require('./src/services/UserService.js');
+const CommentService = require('./src/services/CommentService.js');
 
 
 const app = express();
 app.use(express.json());//pour lire le requ.body en JSON
 const PORT = process.env.PORT;
+const userRepository = new UserRepository(
+    db.User,
+    db.Role
+);
+const commentRepository = new CommentRepositrory(db.Comment);
+const userService = new UserService(userRepository);
+const commentService = new CommentService(commentRepository);
 
 checkRole = async (req, res, next) =>{
     try {
@@ -16,19 +27,7 @@ checkRole = async (req, res, next) =>{
         //Vu qu'il s'agit de lister tous les commentaires, pour pouvoir les modéré par l'admin, on dois verifier le Role de l'utilisateur incrit.
 
         //verification du roles, on va chercher le role associer a l'utilisateur connecté
-        const {role:{name}} = await db.User.findOne({
-            where: {
-                id: userId
-            },
-            attributes:['login'],
-            include: [
-                {
-                    model: db.Role,
-                    as: 'role',
-                    attributes: ['name']
-                }
-            ]
-        });
+        const {role:{name}} = await userService.getByIdWithRole(userId);
         if (!name) {
             const err = new Error("L'utilisateur n'as pas été trouvé");
             err.statusCode = 404;
@@ -51,9 +50,7 @@ checkRole = async (req, res, next) =>{
 app.get("/api/v1/comments", checkTokenJwt,checkRole, async (req, res) => {
     try {
         //Simple requete sequelize pour lister tous les commentaires de tous les lecteurs
-        const comments = await db.Comment.findAll({
-            attributes:['content']
-        });
+        const comments = await commentService.getAll();
         
         res.status(200).json(comments);
     } catch (error) {
