@@ -6,11 +6,15 @@ const commentRoutes = require('./src/routes/CommentRoutes.js');
 const checkTokenJwt = require('./src/middlewares/authMiddlewares.js');
 const checkRole = require('./src/middlewares/userMiddleware.js');
 const db = require('./src/models');
+const CommentRepositrory = require('./src/Repositories/CommentRepository.js');
+const CommentService = require('./src/services/CommentService.js');
 
 
 const app = express();
 app.use(express.json());//pour lire le requ.body en JSON
 const PORT = process.env.PORT;
+const commentRepository = new CommentRepositrory(db.Comment);
+const commentService = new CommentService(commentRepository);
 
 
 app.patch("/api/v1/comments/:id", checkTokenJwt, checkRole, async (req, res) => {
@@ -20,14 +24,7 @@ app.patch("/api/v1/comments/:id", checkTokenJwt, checkRole, async (req, res) => 
         //dans cette routes, l'administrateur va supprimer le commentaire (modération)
         // on va néanmois garder l'entrée pour ne pas descendre la progression
         //simple commande sequelize
-        await db.Comment.update({
-            content: message
-        }, {
-            where: {
-                id
-            },
-        }
-        );
+        await commentService.update({id, message});
 
         res.status(200).json({ message: `le commentaire ${id} à bien été supprimer` });
 

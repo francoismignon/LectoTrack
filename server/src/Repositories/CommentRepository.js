@@ -3,6 +3,17 @@ class CommentRepositrory{
         this.Comment = CommentModel;
     }
 
+    async update(message) {
+        return await this.Comment.update({
+            content: message.message
+        }, {
+            where: {
+                id:message.id
+            },
+        }
+        );
+    }
+
     async getAll(){
         return await this.Comment.findAll({
             attributes:['id', 'content']
