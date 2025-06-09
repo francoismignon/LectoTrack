@@ -11,6 +11,8 @@ const commentRepository = new CommentRepositrory(db.Comment);
 const commentService = new CommentService(commentRepository);
 const commentController = new CommentController(commentService);
 
+
+router.patch("/:id", checkTokenJwt, checkRole, commentController.update);
 router.get("/", checkTokenJwt, checkRole, commentController.getAll);
 
 module.exports = router;
