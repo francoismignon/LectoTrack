@@ -4,11 +4,22 @@ const authRoutes = require('./src/routes/AuthRoutes.js');
 const ReadingRoutes = require('./src/routes/ReadingRoutes.js');
 const { checkTokenJwt } = require('./src/middlewares/authMiddlewares.js');
 const db = require('./src/models');
+const ReadingRepository = require('./src/Repositories/ReadingRepository.js');
+const ReadingService = require('./src/services/ReadingService.js');
+const CommentRepositrory = require('./src/Repositories/CommentRepository.js');
 
 
 const app = express();
 app.use(express.json());//pour lire le requ.body en JSON
 const PORT = process.env.PORT;
+const readingRepository = new ReadingRepository(
+    db.Reading,
+    db.Book,
+    db.Author,
+    db.Status,
+    db.Comment
+);
+const readingService = new ReadingService(readingRepository);
 
 
 app.get("/api/v1/readings/:id/comments", checkTokenJwt, async (req, res) => {
@@ -18,32 +29,9 @@ app.get("/api/v1/readings/:id/comments", checkTokenJwt, async (req, res) => {
         const { id: userId } = req.user;
         const { id: idReading } = req.params;
 
-        const comments = await db.Reading.findAll({
-            where: {
-                id: idReading,
-                userId
-            },
-            attributes: ['progress'],
-            include: [
-                {
-                    model: db.Comment,
-                    as: 'comments',
-                    attributes: ['pageNbr', 'content']
-                },
-                {
-                    model: db.Book,
-                    as: 'book',
-                    attributes: ['coverUrl', 'title'],
-                    include:[
-                        {
-                            model:db.Author,
-                            as:'author',
-                            attributes:['name']
-                        }
-                    ]
-                }
-            ]
-
+        const comments = await readingService.getAllCommentsByReadingId({
+            idReading,
+            userId
         });
         res.status(200).json(comments);
     } catch (error) {

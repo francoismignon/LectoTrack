@@ -1,9 +1,40 @@
 class ReadingRepository {
-    constructor(ReadingModel, BookModel, AuthorModel, StatusModel) {
+    constructor(ReadingModel, BookModel, AuthorModel, StatusModel, CommentModel) {
         this.Reading = ReadingModel;
         this.Book = BookModel;
         this.Author = AuthorModel;
         this.Status = StatusModel;
+        this.Comment = CommentModel;
+    }
+
+    async getAllCommentsByReadingId(reading){
+        return await this.Reading.findAll({
+            where: {
+                id: reading.idReading,
+                userId: reading.userId
+            },
+            attributes: ['progress'],
+            include: [
+                {
+                    model: this.Comment,
+                    as: 'comments',
+                    attributes: ['pageNbr', 'content']
+                },
+                {
+                    model: this.Book,
+                    as: 'book',
+                    attributes: ['coverUrl', 'title'],
+                    include:[
+                        {
+                            model:this.Author,
+                            as:'author',
+                            attributes:['name']
+                        }
+                    ]
+                }
+            ]
+
+        });
     }
 
     async update(reading) {

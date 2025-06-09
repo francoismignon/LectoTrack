@@ -4,6 +4,13 @@ class ReadingService{
         this.CommentRepository = CommentRepository;
     }
 
+    async getAllCommentsByReadingId(reading){
+        return await this.readingRepository.getAllCommentsByReadingId({
+            idReading: reading.idReading,
+            userId:reading.userId
+        });
+    }
+
     async update(reading){
         //On calcule le pourcentage de progression
         const progress = Math.round((reading.pageNbr/reading.nbrPages) * 100); //suppression des chiffres apres la vigurle
