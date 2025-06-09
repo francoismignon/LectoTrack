@@ -5,7 +5,7 @@ class CommentRepositrory{
 
     async getAll(){
         return await this.Comment.findAll({
-            attributes:['content']
+            attributes:['id', 'content']
         });
     }
 
