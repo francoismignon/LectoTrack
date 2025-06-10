@@ -17,7 +17,7 @@ function LibraryPage() {
 
   async function fetchReadings() {
     try {
-      let url = `http://localhost:3000/api/v1/readings?page=${page}&limit=5`;
+      let url = `http://localhost:3000/api/v1/readings?page=${page}&limit=4`;
       if (filter) url += `&status=${filter}`;
 
       const response = await axios.get(url, {
