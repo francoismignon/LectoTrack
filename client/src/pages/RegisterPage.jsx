@@ -1,12 +1,18 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import {Navigate, useNavigate} from 'react-router-dom';
 
 function RegisterPage() {
 
   const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const navigate = useNavigate();
 
+
+  function handleClick(){
+    navigate('/connexion');
+  }
 
   async function handleSubmit(e){
     
@@ -22,7 +28,7 @@ function RegisterPage() {
         confirmPassword
       });
       alert("Inscription réussie");
-      console.log("Inscription réussie :", response.data);
+      navigate('/connexion');
 
     } catch (error) {
       console.log(error.message);
@@ -58,6 +64,8 @@ function RegisterPage() {
         <input onChange={handleConfirmPasswordChange} type="password" name="confirmPassword" id="confirmPassword" required/>
         <input type="submit" value="Inscription" />
       </form>
+      <label>Déja inscrit ?</label>
+      <input onClick={handleClick} type="button" value="Connexion" />
     </div>
   );
 }
