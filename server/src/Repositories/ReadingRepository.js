@@ -92,7 +92,7 @@ class ReadingRepository {
             where: {
                 userId: user
             },
-            attributes: ['progress'],
+            attributes: ['id','progress'],
             include: [
                 {
                     model: this.Book,
