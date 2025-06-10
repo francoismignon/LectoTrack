@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import {useNavigate} from 'react-router-dom';
-import '../styles/RegisterPage.css';
+import { useNavigate } from 'react-router-dom';
+import '../styles/global.css';
 
 function RegisterPage() {
   const [login, setLogin] = useState('');
@@ -9,18 +9,14 @@ function RegisterPage() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const navigate = useNavigate();
 
-  function handleClick(){
-    navigate('/connexion');
-  }
-
-  async function handleSubmit(e){
+  async function handleSubmit(e) {
     e.preventDefault();
-    if(password !== confirmPassword){
-      alert("Les mots de passe ne correspondent pas !");
+    if (password !== confirmPassword) {
+      alert("Les mots de passe ne correspondent pas!");
       return;
     }
     try {
-      const response = await axios.post('http://localhost:3000/api/v1/auth/register', {
+      await axios.post('http://localhost:3000/api/v1/auth/register', {
         login,
         password,
         confirmPassword
@@ -28,54 +24,46 @@ function RegisterPage() {
       alert("Inscription réussie");
       navigate('/connexion');
     } catch (error) {
-      console.log(error.message);
+      alert("Erreur lors de l'inscription");
     }
-  }
-
-  function handleConfirmPasswordChange(e){
-    const {name, value} = e.target;
-    setConfirmPassword(value);
-  }
- 
-  function handlePasswordChange(e){
-    const {name, value} = e.target;
-    setPassword(value);
-  }
-
-  function handleLoginChange(e) {
-    const {name, value} = e.target;
-    setLogin(value);
   }
 
   return (
     <div className="container">
-      <div className="form-card">
-        <h1>Inscription</h1>
-        
-        <form onSubmit={handleSubmit} className="form">
-          <div className="form-group">
-            <label htmlFor="login">Pseudo</label>
-            <input onChange={handleLoginChange} type="text" id='login' name='login' required/>
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="password">Mot de passe</label>
-            <input onChange={handlePasswordChange} type="password" name="password" id="password" required/>
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="confirmPassword">Confirmation mot de passe</label>
-            <input onChange={handleConfirmPasswordChange} type="password" name="confirmPassword" id="confirmPassword" required/>
-          </div>
-
-          <input type="submit" value="Inscription" className="btn btn-primary" />
-        </form>
-
-        <div className="login-section">
-          <label>Déjà inscrit ?</label>
-          <input onClick={handleClick} type="button" value="Connexion" className="btn btn-secondary" />
+      <h1>Inscription</h1>
+      <form onSubmit={handleSubmit}>
+        <div className="form-group">
+          <label>Pseudo</label>
+          <input 
+            type="text" 
+            value={login}
+            onChange={(e) => setLogin(e.target.value)}
+            required 
+          />
         </div>
-      </div>
+        <div className="form-group">
+          <label>Mot de passe</label>
+          <input 
+            type="password" 
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required 
+          />
+        </div>
+        <div className="form-group">
+          <label>Confirmer mot de passe</label>
+          <input 
+            type="password" 
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required 
+          />
+        </div>
+        <button type="submit">S'inscrire</button>
+        <button type="button" className="btn-secondary" onClick={() => navigate('/connexion')}>
+          Déjà inscrit? Connexion
+        </button>
+      </form>
     </div>
   );
 }

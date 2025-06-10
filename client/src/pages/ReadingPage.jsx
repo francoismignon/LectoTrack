@@ -1,137 +1,86 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import '../styles/ReadingPage.css';
+import '../styles/global.css';
 
 function ReadingPage() {
-    const { id } = useParams();
-    const navigate = useNavigate();
-    const [reading, setReading] = useState(null);
-    const [currentPage, setCurrentPage] = useState('');
-    const [comment, setComment] = useState('');
-    const [nbrPages, setNbrPages] = useState(''); // Stocker le nombre total de pages
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [reading, setReading] = useState(null);
+  const [currentPage, setCurrentPage] = useState('');
+  const [comment, setComment] = useState('');
 
-    useEffect(() => {
-        async function fetchReading() {
-            try {
-                const response = await axios.get(`http://localhost:3000/api/v1/readings/${id}`, {
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-                    }
-                });
-                setReading(response.data);
-                setCurrentPage(response.data.currentPage || '');
-                setComment(response.data.comment || '');
-                // Stocker le nombre de pages du livre
-                setNbrPages(response.data.book.nbrPages || '');
-            } catch (error) {
-                console.log(error.message);
-                // Si l'authentification échoue, rediriger vers la connexion
-                if (error.response && error.response.status === 401) {
-                    localStorage.removeItem('accessToken');
-                    navigate('/connexion');
-                }
-            }
-        }
-        fetchReading();
-    }, [id, navigate]);
-
-    async function handleModify() {
-        try {
-            await axios.patch(`http://localhost:3000/api/v1/readings/${id}`, {
-                nbrPages: nbrPages, // Nombre total de pages (fixe)
-                pageNbr: currentPage, // Page actuelle
-                content: comment // Commentaire
-            }, {
-                headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-                }
-            });
-            
-            alert('Lecture mise à jour avec succès !');
-            
-            // Redirection vers la page de résumé
-            navigate(`/resume/${id}`);
-            
-        } catch (error) {
-            console.log('Erreur lors de la mise à jour:', error.message);
-            alert('Erreur lors de la mise à jour de la lecture');
-        }
-    }
-
-    function handleBackToLibrary() {
+  useEffect(() => {
+    async function fetchReading() {
+      try {
+        const response = await axios.get(`http://localhost:3000/api/v1/readings/${id}`, {
+          headers: { 'Authorization': `Bearer ${localStorage.getItem('accessToken')}` }
+        });
+        setReading(response.data);
+        setCurrentPage(response.data.currentPage || '');
+        setComment(response.data.comment || '');
+      } catch (error) {
         navigate('/bibliotheque');
+      }
     }
+    fetchReading();
+  }, [id]);
 
-    if (!reading) {
-        return <div>Chargement...</div>;
+  async function handleUpdate() {
+    try {
+      await axios.patch(`http://localhost:3000/api/v1/readings/${id}`, {
+        nbrPages: reading.book.nbrPages,
+        pageNbr: currentPage,
+        content: comment
+      }, {
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('accessToken')}` }
+      });
+      alert('Mis à jour!');
+      navigate(`/resume/${id}`);
+    } catch (error) {
+      alert('Erreur lors de la mise à jour');
     }
+  }
 
-    return (
-        <div className="container">
-            <div className="reading-card">
-                <div className="header-section">
-                    <button onClick={handleBackToLibrary} className="btn btn-back">
-                        ← Retour à la bibliothèque
-                    </button>
-                </div>
+  if (!reading) return <div>Chargement...</div>;
 
-                {/* Image du livre */}
-                <div className="book-cover">
-                    <img src={reading.book.coverUrl} alt={reading.book.title} />
-                </div>
-
-                {/* Barre de progression avec pourcentage */}
-                <div className="progress-section">
-                    <div className="progress-bar">
-                        <div 
-                            className="progress-fill" 
-                            style={{ width: `${reading.progress}%` }}
-                        ></div>
-                    </div>
-                    <div className="progress-text">{reading.progress}%</div>
-                </div>
-
-                {/* Titre du livre */}
-                <h2 className="book-title">{reading.book.title}</h2>
-
-                {/* Auteur */}
-                <p className="book-author">{reading.book.author.name}</p>
-
-                {/* Informations sur les pages */}
-                <p className="page-info">Pages totales: {nbrPages}</p>
-
-                {/* Numéro de page (input) */}
-                <div className="page-input">
-                    <label>Page actuelle:</label>
-                    <input 
-                        type="number" 
-                        value={currentPage}
-                        onChange={(e) => setCurrentPage(e.target.value)}
-                        placeholder="Numéro de page"
-                        max={nbrPages}
-                        min="0"
-                    />
-                </div>
-
-                {/* Commentaire (textarea) */}
-                <div className="comment-section">
-                    <label>Commentaire:</label>
-                    <textarea 
-                        value={comment}
-                        onChange={(e) => setComment(e.target.value)}
-                        placeholder="Vos commentaires sur le livre..."
-                        rows="4"
-                    ></textarea>
-                </div>
-
-                {/* Bouton modifier */}
-                <button className="modify-button" onClick={handleModify}>
-                    Modifier
-                </button>
-            </div>
-        </div>
-    );
+  return (
+    <div className="container">
+      <h1>{reading.book.title}</h1>
+      <button onClick={() => navigate('/bibliotheque')}>Retour</button>
+      
+      <img src={reading.book.coverUrl} alt={reading.book.title} className="book-cover" />
+      <p>Auteur: {reading.book.author.name}</p>
+      <p>Pages totales: {reading.book.nbrPages}</p>
+      
+      <div className="progress-bar">
+        <div className="progress-fill" style={{ width: `${reading.progress}%` }}></div>
+      </div>
+      <p>Progression: {reading.progress}%</p>
+      
+      <div className="form-group">
+        <label>Page actuelle</label>
+        <input 
+          type="number" 
+          value={currentPage}
+          onChange={(e) => setCurrentPage(e.target.value)}
+          max={reading.book.nbrPages}
+          min="0"
+        />
+      </div>
+      
+      <div className="form-group">
+        <label>Commentaire</label>
+        <textarea 
+          value={comment}
+          onChange={(e) => setComment(e.target.value)}
+          rows="4"
+        />
+      </div>
+      
+      <button onClick={handleUpdate}>Enregistrer</button>
+    </div>
+  );
 }
 
 export default ReadingPage;
