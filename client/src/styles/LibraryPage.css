@@ -23,9 +23,14 @@ body {
   margin: 0 auto;
 }
 
-h1 {
-  text-align: center;
+.header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 30px;
+}
+
+h1 {
   color: #333;
   font-size: 24px;
 }
@@ -53,6 +58,38 @@ h1 {
   background-color: #0056b3;
 }
 
+.btn-logout {
+  background-color: #dc3545;
+  color: white;
+}
+
+.btn-logout:hover {
+  background-color: #c82333;
+}
+
+.btn-summary {
+  background-color: #28a745;
+  color: white;
+  padding: 8px 12px;
+  font-size: 12px;
+  margin-right: 8px;
+}
+
+.btn-summary:hover {
+  background-color: #218838;
+}
+
+.btn-delete {
+  background-color: #dc3545;
+  color: white;
+  padding: 8px 12px;
+  font-size: 12px;
+}
+
+.btn-delete:hover {
+  background-color: #c82333;
+}
+
 .readings-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -64,7 +101,6 @@ h1 {
   border: 1px solid #ddd;
   border-radius: 8px;
   padding: 20px;
-  cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
   text-align: center;
 }
@@ -72,6 +108,11 @@ h1 {
 .reading-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.reading-content {
+  cursor: pointer;
+  margin-bottom: 15px;
 }
 
 .reading-card img {
@@ -93,4 +134,31 @@ h1 {
   margin-bottom: 5px;
   color: #666;
   font-size: 12px;
+}
+
+.reading-actions {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 15px;
+  border-top: 1px solid #eee;
+  padding-top: 15px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .header-section {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+  }
+  
+  .reading-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .btn-summary, .btn-delete {
+    margin-right: 0;
+  }
 }

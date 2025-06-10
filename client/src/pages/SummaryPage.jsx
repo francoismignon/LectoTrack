@@ -39,13 +39,22 @@ function SummaryPage() {
 
             } catch (error) {
                 console.log('Erreur lors du chargement:', error.message);
+                // Si l'authentification échoue, rediriger vers la connexion
+                if (error.response && error.response.status === 401) {
+                    localStorage.removeItem('accessToken');
+                    navigate('/connexion');
+                }
             }
         }
         fetchData();
-    }, [id]);
+    }, [id, navigate]);
 
     function handleDetailsClick() {
         navigate(`/lecture/${id}`);
+    }
+
+    function handleBackToLibrary() {
+        navigate('/bibliotheque');
     }
 
     if (!reading) {
@@ -55,6 +64,12 @@ function SummaryPage() {
     return (
         <div className="container">
             <div className="summary-layout">
+                <div className="header-section">
+                    <button onClick={handleBackToLibrary} className="btn btn-back">
+                        ← Retour à la bibliothèque
+                    </button>
+                </div>
+
                 {/* Section gauche - Informations du livre */}
                 <div className="book-info-section">
                     {/* Image du livre */}

@@ -31,6 +31,11 @@ function AddBookPages() {
             navigate('/bibliotheque');
         } catch (error) {
             console.log(error.message);
+            // Si l'authentification échoue, rediriger vers la connexion
+            if (error.response && error.response.status === 401) {
+                localStorage.removeItem('accessToken');
+                navigate('/connexion');
+            }
         }
     }
 
@@ -67,9 +72,19 @@ function AddBookPages() {
         setNbrPages(value);
     }
 
+    function handleBackToLibrary() {
+        navigate('/bibliotheque');
+    }
+
     return (
         <div className="container">
             <div className="form-card">
+                <div className="header-section">
+                    <button onClick={handleBackToLibrary} className="btn btn-back">
+                        ← Retour à la bibliothèque
+                    </button>
+                </div>
+                
                 <h1>Ajouter un livre</h1>
                 
                 {coverUrl && (
@@ -85,6 +100,7 @@ function AddBookPages() {
                             type="text"
                             value={title}
                             onChange={handleTitleChange}
+                            required
                         />
                     </div>
 
@@ -94,6 +110,7 @@ function AddBookPages() {
                             type="text"
                             value={authorName}
                             onChange={handleAuthorChange} 
+                            required
                         />
                     </div>
 
@@ -102,7 +119,9 @@ function AddBookPages() {
                         <input
                             type="number"
                             value={nbrPages}
-                            onChange={handleNbrPagesChange} 
+                            onChange={handleNbrPagesChange}
+                            min="1"
+                            required
                         />
                     </div>
 

@@ -26,10 +26,15 @@ function ReadingPage() {
                 setNbrPages(response.data.book.nbrPages || '');
             } catch (error) {
                 console.log(error.message);
+                // Si l'authentification échoue, rediriger vers la connexion
+                if (error.response && error.response.status === 401) {
+                    localStorage.removeItem('accessToken');
+                    navigate('/connexion');
+                }
             }
         }
         fetchReading();
-    }, [id]);
+    }, [id, navigate]);
 
     async function handleModify() {
         try {
@@ -54,6 +59,10 @@ function ReadingPage() {
         }
     }
 
+    function handleBackToLibrary() {
+        navigate('/bibliotheque');
+    }
+
     if (!reading) {
         return <div>Chargement...</div>;
     }
@@ -61,6 +70,12 @@ function ReadingPage() {
     return (
         <div className="container">
             <div className="reading-card">
+                <div className="header-section">
+                    <button onClick={handleBackToLibrary} className="btn btn-back">
+                        ← Retour à la bibliothèque
+                    </button>
+                </div>
+
                 {/* Image du livre */}
                 <div className="book-cover">
                     <img src={reading.book.coverUrl} alt={reading.book.title} />
