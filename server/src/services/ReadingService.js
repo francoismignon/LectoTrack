@@ -57,8 +57,8 @@ class ReadingService{
         //on cree la nouvelle lecture
         return await this.readingRepository.create(reading);
     }
-    async getAll(user, status){
-        return await this.readingRepository.getAll(user, status);
+    async getAll(user, status, page, limit){
+        return await this.readingRepository.getAll(user, status, page, limit);
     }
     async getById(idReading, userId){
         return await this.readingRepository.getById(idReading, userId); 

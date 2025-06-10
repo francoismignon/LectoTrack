@@ -115,7 +115,7 @@ class ReadingController{
     getReadings = async (req, res) => {
         try {
             const { id } = req.user; //Nom d'utilisateur connecté + id
-            const { status } = req.query; //pour les filtre et les tris
+            const { status, page, limit } = req.query; //pour les filtre et les tris et la magination
 
             //toutes les lecture en cours pour l'utilisateur connecter
             //pour chaque => image du livre, titre du livre, auteur du livres, pourcentage de progression et status de lecture
@@ -124,7 +124,7 @@ class ReadingController{
             //filtée par status
 
             //chercher en DB toutes les lecture de cet utilisateur
-            const readings = await this.readingService.getAll(id, status);
+            const readings = await this.readingService.getAll(id, status, page, limit);
             res.status(200).json(readings);
 
         } catch (error) {

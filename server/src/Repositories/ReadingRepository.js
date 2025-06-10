@@ -87,21 +87,22 @@ class ReadingRepository {
             }
         });
     }
-    async getAll(user, status){
-        return await this.Reading.findAll({
+    async getAll(user, status, page, limit) {
+        const offset = (page - 1) * limit
+        const result = await this.Reading.findAndCountAll({
             where: {
                 userId: user
             },
-            attributes: ['id','progress'],
+            attributes: ['id', 'progress'],
             include: [
                 {
                     model: this.Book,
-                    as:'book',
+                    as: 'book',
                     attributes: ['title', 'coverUrl'],
                     include: [
                         {
                             model: this.Author,
-                            as:'author',
+                            as: 'author',
                             attributes: ['name']
                         },
                         ///////////////si j'ai le temp, on fera un triage par categorie
@@ -122,14 +123,24 @@ class ReadingRepository {
                 },
                 {
                     model: this.Status,
-                    as:'status',
+                    as: 'status',
                     attributes: ['name'],
-                    where: status?{
-                        name:status //on trie les lecture par status
-                    }:undefined //si il n'y a pas de parametre(donc si on vx tout)
+                    where: status ? {
+                        name: status //on trie les lecture par status
+                    } : undefined //si il n'y a pas de parametre(donc si on vx tout)
                 }
-            ]
+            ],
+            limit: parseInt(limit),
+            offset: parseInt(offset)
         });
+        return {
+            data: result.rows,
+            pagination: {
+                currentPage: parseInt(page),
+                totalPages: Math.ceil(result.count / limit),
+                totalItems: result.count
+            }
+        };
     }
     async getById (idReading, userId){
         console.log(this.Book.associations);     // doit contenir 'author'
