@@ -6,6 +6,7 @@ import '../styles/LibraryPage.css';
 function LibraryPage() {
     const [reading, setReading] = useState([]);
     const navigate = useNavigate();
+    const isAdmin = localStorage.getItem('userRole') === '1';
 
     useEffect(() => {
         async function fetchReadings() {
@@ -39,8 +40,13 @@ function LibraryPage() {
         navigate(`/resume/${readingId}`);
     }
 
+    function handleModerationClick() {
+        navigate('/moderation');
+    }
+
     function handleLogout() {
         localStorage.removeItem('accessToken');
+        localStorage.removeItem('userRole');
         // IMPORTANT: replace: true empêche le retour en arrière
         navigate('/connexion', { replace: true });
     }
@@ -68,9 +74,16 @@ function LibraryPage() {
             <div className="library-card">
                 <div className="header-section">
                     <h1>Bibliothèque</h1>
-                    <button onClick={handleLogout} className="btn btn-logout">
-                        Déconnexion
-                    </button>
+                    <div className="header-buttons">
+                        {isAdmin && (
+                            <button onClick={handleModerationClick} className="btn btn-admin">
+                                Modération
+                            </button>
+                        )}
+                        <button onClick={handleLogout} className="btn btn-logout">
+                            Déconnexion
+                        </button>
+                    </div>
                 </div>
                 
                 <button onClick={handleAddBookClick} type="button" className="btn btn-primary add-book-btn">

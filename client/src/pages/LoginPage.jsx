@@ -17,6 +17,7 @@ function LoginPage() {
             })
             //si mode de passe incorrect, l'erreur est leve dans axios
             localStorage.setItem('accessToken', data.token);
+            localStorage.setItem('userRole', data.roleId.toString());
             navigate('/bibliotheque');
            
         } catch (error) {

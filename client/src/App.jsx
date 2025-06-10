@@ -6,7 +6,9 @@ import LibraryPage from './pages/LibraryPage';
 import AddBookPage from './pages/AddBookPage';
 import ReadingPage from './pages/ReadingPage';
 import SummaryPage from './pages/SummaryPage';
+import ModerationPage from './pages/ModerationPage';
 import ProtectedRoute from './components/ProtectedRoute';
+import AdminRoute from './components/AdminRoute';
 
 function App() {
   return(
@@ -37,6 +39,13 @@ function App() {
           <ProtectedRoute>
             <SummaryPage />
           </ProtectedRoute>
+        }/>
+        
+        {/* Route admin uniquement */}
+        <Route path="/moderation" element={
+          <AdminRoute>
+            <ModerationPage />
+          </AdminRoute>
         }/>
       </Routes>
     </BrowserRouter>
