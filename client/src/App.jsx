@@ -4,7 +4,8 @@ import RegisterPage from './pages/RegisterPage';
 import LoginPage from './pages/LoginPage';
 import LibraryPage from './pages/LibraryPage';
 import AddBookPage from './pages/AddBookPage';
-import ReadingPage from './pages/ReadingPage'
+import ReadingPage from './pages/ReadingPage';
+import SummaryPage from './pages/SummaryPage';
 
 function App() {
   return(
@@ -15,6 +16,7 @@ function App() {
         <Route path="/bibliotheque" element={<LibraryPage />}/>
         <Route path="/AjoutLivre" element={<AddBookPage />}/>
         <Route path="/lecture/:id" element={<ReadingPage />}/>
+        <Route path="/resume/:id" element={<SummaryPage />}/>
       </Routes>
     </BrowserRouter>
   );

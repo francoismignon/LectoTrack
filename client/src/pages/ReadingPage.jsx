@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../styles/ReadingPage.css';
 
 function ReadingPage() {
     const { id } = useParams();
+    const navigate = useNavigate();
     const [reading, setReading] = useState(null);
     const [currentPage, setCurrentPage] = useState('');
     const [comment, setComment] = useState('');
+    const [nbrPages, setNbrPages] = useState(''); // Stocker le nombre total de pages
 
     useEffect(() => {
         async function fetchReading() {
@@ -20,12 +22,37 @@ function ReadingPage() {
                 setReading(response.data);
                 setCurrentPage(response.data.currentPage || '');
                 setComment(response.data.comment || '');
+                // Stocker le nombre de pages du livre
+                setNbrPages(response.data.book.nbrPages || '');
             } catch (error) {
                 console.log(error.message);
             }
         }
         fetchReading();
     }, [id]);
+
+    async function handleModify() {
+        try {
+            await axios.patch(`http://localhost:3000/api/v1/readings/${id}`, {
+                nbrPages: nbrPages, // Nombre total de pages (fixe)
+                pageNbr: currentPage, // Page actuelle
+                content: comment // Commentaire
+            }, {
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+                }
+            });
+            
+            alert('Lecture mise à jour avec succès !');
+            
+            // Redirection vers la page de résumé
+            navigate(`/resume/${id}`);
+            
+        } catch (error) {
+            console.log('Erreur lors de la mise à jour:', error.message);
+            alert('Erreur lors de la mise à jour de la lecture');
+        }
+    }
 
     if (!reading) {
         return <div>Chargement...</div>;
@@ -56,6 +83,9 @@ function ReadingPage() {
                 {/* Auteur */}
                 <p className="book-author">{reading.book.author.name}</p>
 
+                {/* Informations sur les pages */}
+                <p className="page-info">Pages totales: {nbrPages}</p>
+
                 {/* Numéro de page (input) */}
                 <div className="page-input">
                     <label>Page actuelle:</label>
@@ -64,6 +94,8 @@ function ReadingPage() {
                         value={currentPage}
                         onChange={(e) => setCurrentPage(e.target.value)}
                         placeholder="Numéro de page"
+                        max={nbrPages}
+                        min="0"
                     />
                 </div>
 
@@ -79,7 +111,9 @@ function ReadingPage() {
                 </div>
 
                 {/* Bouton modifier */}
-                <button className="modify-button">Modifier</button>
+                <button className="modify-button" onClick={handleModify}>
+                    Modifier
+                </button>
             </div>
         </div>
     );
