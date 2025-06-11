@@ -11,7 +11,7 @@ function LoginPage() {
   async function handleSubmit(e) {
     e.preventDefault();
     try {
-      const { data } = await axios.post('http://localhost:3000/api/v1/auth/login', {
+      const { data } = await api.post('/auth/login', {
         login,
         password
       });

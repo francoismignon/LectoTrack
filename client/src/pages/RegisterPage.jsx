@@ -16,7 +16,7 @@ function RegisterPage() {
       return;
     }
     try {
-      await axios.post('http://localhost:3000/api/v1/auth/register', {
+      await api.post('/auth/register', {
         login,
         password,
         confirmPassword

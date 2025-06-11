@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { api } from '../api';
 import '../styles/global.css';
 
 function ReadingPage() {
@@ -13,7 +13,7 @@ function ReadingPage() {
   useEffect(() => {
     async function fetchReading() {
       try {
-        const response = await axios.get(`http://localhost:3000/api/v1/readings/${id}`, {
+        const response = await api.get(`/readings/${id}`, {
           headers: { 'Authorization': `Bearer ${localStorage.getItem('accessToken')}` }
         });
         setReading(response.data);
@@ -28,7 +28,7 @@ function ReadingPage() {
 
   async function handleUpdate() {
     try {
-      await axios.patch(`http://localhost:3000/api/v1/readings/${id}`, {
+      await api.patch(`/readings/${id}`, {
         nbrPages: reading.book.nbrPages,
         pageNbr: currentPage,
         content: comment

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import { api } from '../api';
 import { useNavigate } from 'react-router-dom';
 import '../styles/global.css';
 
@@ -13,7 +13,7 @@ function ModerationPage() {
 
   async function fetchComments() {
     try {
-      const response = await axios.get('http://localhost:3000/api/v1/comments', {
+      const response = await api.get('/comments', {
         headers: { 'Authorization': `Bearer ${localStorage.getItem('accessToken')}` }
       });
       setComments(response.data);
@@ -25,7 +25,7 @@ function ModerationPage() {
   async function moderateComment(id) {
     if (confirm('Modérer ce commentaire?')) {
       try {
-        await axios.patch(`http://localhost:3000/api/v1/comments/${id}`, {}, {
+        await api.patch(`http://localhost:3000/api/v1/comments/${id}`, {}, {
           headers: { 'Authorization': `Bearer ${localStorage.getItem('accessToken')}` }
         });
         fetchComments();

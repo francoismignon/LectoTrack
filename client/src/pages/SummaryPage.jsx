@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { api } from '../api';
 import '../styles/global.css';
 
 function SummaryPage() {
@@ -12,12 +12,12 @@ function SummaryPage() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const readingResponse = await axios.get(`http://localhost:3000/api/v1/readings/${id}`, {
+        const readingResponse = await api.get(`/readings/${id}`, {
           headers: { 'Authorization': `Bearer ${localStorage.getItem('accessToken')}` }
         });
         setReading(readingResponse.data);
 
-        const commentsResponse = await axios.get(`http://localhost:3000/api/v1/readings/${id}/comments`, {
+        const commentsResponse = await api.get(`/readings/${id}/comments`, {
           headers: { 'Authorization': `Bearer ${localStorage.getItem('accessToken')}` }
         });
         

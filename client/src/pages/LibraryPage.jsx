@@ -36,7 +36,7 @@ function LibraryPage() {
   async function deleteReading(id) {
     if (confirm('Supprimer cette lecture?')) {
       try {
-        await axios.delete(`http://localhost:3000/api/v1/readings/${id}`, {
+        await api.delete(`/readings/${id}`, {
           headers: { 'Authorization': `Bearer ${localStorage.getItem('accessToken')}` }
         });
         fetchReadings();

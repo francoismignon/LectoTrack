@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import { api } from '../api';
 import { useNavigate } from 'react-router-dom';
 import '../styles/global.css';
 
@@ -13,7 +13,7 @@ function AddBookPage() {
   async function handleSubmit(e) {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:3000/api/v1/readings', {
+      await api.post('/readings', {
         title,
         coverUrl,
         nbrPages,
